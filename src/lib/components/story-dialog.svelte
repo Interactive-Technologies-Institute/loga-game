@@ -12,10 +12,6 @@
 
 	let { open = $bindable(false), gameState }: StoryDialogProps = $props();
 
-	$effect(() => {
-		console.log(currentInput);
-	});
-
 	let playerState = $state(gameState.playersState[gameState.playerId]);
 	$effect(() => {
 		if (playerState.state === 'writing') {
@@ -33,24 +29,15 @@
 	let playerAnswers = $derived.by(() => {
 		return gameState.playersAnswers.filter((answer) => answer.player_id === gameState.playerId);
 	});
-
 	let currentRound = $derived.by(() => {
 		return gameState.gameRounds.find((round) => round.round === gameState.currentRound)?.round;
 	});
-	let currentAnswer = $derived.by(() => {
-		return playerAnswers.find((answer) => answer.round === currentRound)?.answer;
-	});
-
-	let currentInput = $state(currentAnswer ?? '');
-	$effect(() => {
-		if (currentAnswer !== undefined) {
-			currentInput = currentAnswer;
-		}
-	});
+	let currentAnswer = $state('');
 
 	function onSubmit() {
-		gameState.submitAnswer(currentInput);
+		gameState.submitAnswer(currentAnswer);
 		open = false;
+		currentAnswer = '';
 	}
 </script>
 
@@ -81,7 +68,7 @@
 					</p>
 					{#if round.index === currentRound}
 						<div class="flex-1 relative">
-							<Textarea class="h-full mt-2" bind:value={currentInput} />
+							<Textarea class="h-full mt-2" bind:value={currentAnswer} />
 							<Button class="absolute bottom-2 right-4" onclick={onSubmit}>Submit</Button>
 						</div>
 					{:else}
