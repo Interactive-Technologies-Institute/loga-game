@@ -1771,7 +1771,7 @@ VALUES (
     (
         115,
         false,
-        '',
+        'Deserta Grande',
         2309.35,
         1908.65,
         ARRAY [129],
@@ -1780,7 +1780,7 @@ VALUES (
     (
         116,
         false,
-        '',
+        'Vila Baleira',
         2326.16,
         447.72,
         ARRAY [103, 105, 129],
@@ -1789,7 +1789,7 @@ VALUES (
     (
         117,
         false,
-        '',
+        'Porto das Salemas',
         2298.53,
         308.39,
         ARRAY [104, 18],
@@ -1798,7 +1798,7 @@ VALUES (
     (
         118,
         true,
-        '',
+        'Farol da Ponta do Pargo',
         291.81,
         880.41,
         ARRAY [39, 28],
@@ -1807,7 +1807,7 @@ VALUES (
     (
         119,
         false,
-        '',
+        'Porto Moniz',
         582.78,
         648.6,
         ARRAY [4, 34, 43],
@@ -1816,7 +1816,7 @@ VALUES (
     (
         120,
         false,
-        '',
+        'Fanal',
         649.43,
         902.83,
         ARRAY [37, 41],
@@ -1825,7 +1825,7 @@ VALUES (
     (
         121,
         false,
-        '',
+        'S. Vincente',
         1029.97,
         910.66,
         ARRAY [113, 65, 47],
@@ -1834,7 +1834,7 @@ VALUES (
     (
         122,
         false,
-        '',
+        'Bica da Cana',
         882.75,
         1113.83,
         ARRAY [69, 42, 70],
@@ -1843,7 +1843,7 @@ VALUES (
     (
         123,
         false,
-        '',
+        'Calheta',
         565.35,
         1269.89,
         ARRAY [8, 29, 52],
@@ -1852,7 +1852,7 @@ VALUES (
     (
         124,
         false,
-        '',
+        'Ribeira Brava',
         952.17,
         1482.38,
         ARRAY [10, 94, 53],
@@ -1861,7 +1861,7 @@ VALUES (
     (
         125,
         false,
-        '',
+        'Encumeada',
         1081.68,
         1235.19,
         ARRAY [114, 112, 50],
@@ -1870,7 +1870,7 @@ VALUES (
     (
         126,
         false,
-        '',
+        'Curral das Freiras',
         1309.72,
         1315.11,
         ARRAY [78, 109],
@@ -1879,7 +1879,7 @@ VALUES (
     (
         127,
         false,
-        '',
+        'Cabo Girão',
         1122.08,
         1535.18,
         ARRAY [11, 74],
@@ -1888,7 +1888,7 @@ VALUES (
     (
         128,
         false,
-        '',
+        'Câmara de Lobos',
         1270.03,
         1579.52,
         ARRAY [75, 55],
@@ -1897,7 +1897,7 @@ VALUES (
     (
         129,
         false,
-        '',
+        'Funchal',
         1528.59,
         1575.54,
         ARRAY [80, 23, 56, 95, 115, 116],
@@ -1906,7 +1906,7 @@ VALUES (
     (
         130,
         false,
-        '',
+        'Monte',
         1566.39,
         1399.62,
         ARRAY [22, 96],
@@ -1915,7 +1915,7 @@ VALUES (
     (
         131,
         false,
-        '',
+        'Poiso',
         1549.85,
         1296.06,
         ARRAY [77, 110, 22],
@@ -1924,7 +1924,7 @@ VALUES (
     (
         132,
         false,
-        '',
+        'Pico do Arieiro',
         1418.03,
         1230.19,
         ARRAY [21, 111, 68],
@@ -1933,7 +1933,7 @@ VALUES (
     (
         133,
         false,
-        '',
+        'Pico Ruivo',
         1398.58,
         1126.94,
         ARRAY [16, 66, 111],
@@ -1942,7 +1942,7 @@ VALUES (
     (
         134,
         false,
-        '',
+        'Faial',
         1483.84,
         985.34,
         ARRAY [102, 17],
@@ -1951,7 +1951,7 @@ VALUES (
     (
         135,
         false,
-        '',
+        'Fajã da Nogueira',
         1547.49,
         1069.77,
         ARRAY [63, 79],
@@ -1960,7 +1960,7 @@ VALUES (
     (
         136,
         false,
-        '',
+        'Santana',
         1602.6,
         902.72,
         ARRAY [62, 85, 19],
@@ -1969,7 +1969,7 @@ VALUES (
     (
         137,
         false,
-        '',
+        'Porto da Cruz',
         1784.46,
         1069.02,
         ARRAY [61, 84, 26],
@@ -1978,7 +1978,7 @@ VALUES (
     (
         138,
         false,
-        '',
+        'Ribeiro Frio',
         1622.61,
         1210.53,
         ARRAY [108, 77],
@@ -1987,7 +1987,7 @@ VALUES (
     (
         139,
         false,
-        '',
+        'Santa Cruz',
         1944.59,
         1415.54,
         ARRAY [82, 24, 142],
@@ -1996,7 +1996,7 @@ VALUES (
     (
         140,
         false,
-        '',
+        'Machico',
         2038.47,
         1279.49,
         ARRAY [98, 60, 83],
@@ -2005,7 +2005,7 @@ VALUES (
     (
         141,
         true,
-        '',
+        'Ponta de São Lourenço',
         2299.55,
         1165.7,
         ARRAY [67],
