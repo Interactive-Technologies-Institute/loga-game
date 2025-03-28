@@ -42,7 +42,7 @@
 <div class="bg-[#D8EFF4] w-full h-full overflow-hidden">
 	<div
 		class="origin-center transition-transform relative w-full h-full"
-		style="transform: scale({position.scale}) translate({position.x}px, {position.y}px)"
+		style={`transform: scale(${position.scale}) translate(${position.x}px, ${position.y}px);`}
 	>
 		<img src="/images/map.svg" alt="Game Map" class="w-full h-full" />
 		<svg viewBox="0 0 2834.65 2267.72" class="absolute inset-0 w-full h-full">

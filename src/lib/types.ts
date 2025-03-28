@@ -16,7 +16,14 @@ export type Stop = Database['public']['Tables']['stops']['Row'];
 
 export type CardId = Database['public']['Tables']['cards']['Row']['id'];
 
-export type Card = Database['public']['Tables']['cards']['Row'];
+export type CardType = Database["public"]["Enums"]["stop_type"];
+
+export type Card = {
+	id: number,
+	type: CardType,
+	title: string,
+	text: string,
+}
 
 export type Round = Database['public']['Tables']['rounds']['Row'];
 
@@ -32,6 +39,13 @@ export const CHARACTER_OPTIONS: Character[] = [
 	'time-traveller',
 	'custom'
 ];
+
+export type CharacterCard = {
+    type: Character;
+    title: string;
+    description: string;
+    secondary?: string;
+};
 
 export type PlayerId = Database['public']['Tables']['players']['Row']['id'];
 

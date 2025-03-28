@@ -1,6 +1,7 @@
 import { goto } from '$app/navigation';
 import { supabase } from '@/supabase';
 import type { Character, Game, GameLobbyStateEnum, Player, PlayerId } from '../types';
+import { localizeUrl } from '@src/paraglide/runtime.js';
 
 export class GameLobbyState {
 	code: string = $state('');
@@ -33,7 +34,7 @@ export class GameLobbyState {
 					const state = game.state;
 					if (state === 'starting' || state === 'playing' || state === 'finished') {
 						supabase.channel('game').unsubscribe();
-						goto(`/${this.code}/game`);
+						goto(localizeUrl(`/${this.code}/game`));
 						return;
 					}
 					this.state = game.state as GameLobbyStateEnum;

@@ -4,6 +4,7 @@
 	import { GameLobbyState } from '@/state/game-lobby-state.svelte';
 	import { CHARACTER_OPTIONS } from '@/types';
 	import type { PageData } from './$types';
+	import { m } from '@src/paraglide/messages.js';
 
 	let { data }: { data: PageData } = $props();
 
@@ -12,8 +13,11 @@
 </script>
 
 <div class="h-full flex flex-col items-center justify-center bg-white">
-	<h2 class="text-dark-green text-4xl font-bold mb-10">Lobby: {data.game.code}</h2>
-	<p class="text-dark-green text-lg font-bold mb-4">Select your character</p>
+	<div class="bg-dark-green px-5 py-2 flex flex-col items-center justify-center rounded-lg mt-5">
+		<p class="text-white text-sm font-medium">{m.label_join_code()}</p>
+		<p class="text-white text-4xl font-bold">{data.game.code}</p>
+	</div>
+	<p class="text-dark-green text-lg font-bold my-2">{m.select_character()}</p>
 	<div class="grid grid-cols-4 gap-6 mb-10">
 		{#each CHARACTER_OPTIONS as character}
 			{@const player = gameState.players.find((player) => player.character === character)}
@@ -29,14 +33,19 @@
 	</div>
 	<p class="text-dark-green text-lg font-bold mb-4">
 		{#if gameState.state === 'waiting'}
-			Waiting for players
+			{m.waiting_for_players()}
 		{:else}
-			Players are ready!
+			{m.players_ready()}
 		{/if}
 	</p>
 	{#if currentPlayer.is_owner}
-		<Button size="lg" disabled={gameState.state !== 'ready'} onclick={() => gameState.startGame()}>
-			Start Game
+		<Button
+			class={'mb-5'}
+			size="lg"
+			disabled={gameState.state !== 'ready'}
+			onclick={() => gameState.startGame()}
+		>
+			{m.start_game()}
 		</Button>
 	{/if}
 </div>

@@ -1,6 +1,7 @@
 <script lang="ts">
 	import type { Round } from '@/types';
 	import { cn } from '@/utils';
+	import { m } from '@src/paraglide/messages';
 
 	interface RoundIndicatorProps {
 		rounds: Round[];
@@ -41,8 +42,8 @@
 	</div>
 	{#if currentRound === 0}
 		<div>
-			<h2 class="text-2xl font-medium text-dark-green text-center">Game is starting</h2>
-			<p class="text-center text-text">Choose your starting stop</p>
+			<h2 class="text-2xl font-medium text-dark-green text-center">{m.game_is_starting()}</h2>
+			<p class="text-center text-text">{m.choose_starting_stop()}</p>
 		</div>
 	{:else}
 		<div>

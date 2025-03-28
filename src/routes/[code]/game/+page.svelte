@@ -11,6 +11,8 @@
 	import { MapPosition } from '@/state/map-position.svelte';
 	import { CircleHelp, ScrollText } from 'lucide-svelte';
 	import type { PageData } from './$types';
+	import EndDialog from '@/components/end-dialog.svelte';
+	import { m } from '@src/paraglide/messages';
 
 	let { data }: { data: PageData } = $props();
 
@@ -40,6 +42,19 @@
 
 	let openStoryDialog = $state(false);
 	let openHelpDialog = $state(false);
+	let openEndDialog = $state(false);
+
+	$effect(() => {
+		if (playerState === 'writing') {
+			openStoryDialog = true;
+		}
+	});
+
+	$effect(() => {
+		if (gameState.state === 'finished') {
+			openEndDialog = true;
+		}
+	});
 </script>
 
 <svelte:window onkeydown={(e) => mapPosition.pan(e)} onwheel={(e) => mapPosition.zoom(e)} />
@@ -63,9 +78,9 @@
 			<PlayerBadge {player} state={gameState.playersState[player.id]} />
 		{/each}
 	</div>
-	<div class="absolute left-4 bottom-4">
+	<div class="absolute left-8 bottom-8">
 		{#if dice}
-			<Dice value={dice} />
+			<Dice value={dice} round={gameState.currentRound} />
 		{/if}
 	</div>
 
@@ -73,11 +88,13 @@
 		class="absolute left-0 right-0 bottom-4 flex items-center justify-center text-center text-lg text-text"
 	>
 		{#if playerState === 'moving'}
-			Choose your new stop
+			{m.choose_your_new_stop()}
 		{:else if playerState === 'writing'}
-			Write your story
+			{m.write_story()}
 		{:else if playerState === 'done'}
-			You are done! Waiting for other players...
+			{m.you_are_done()}
 		{/if}
 	</p>
+
+	<EndDialog open={openEndDialog} />
 </div>
