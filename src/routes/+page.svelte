@@ -6,10 +6,38 @@
 	import { m } from '../paraglide/messages.js';
 	import { setLocale, getLocale, localizeUrl } from '../paraglide/runtime.js';
 	import type { Locale } from '../paraglide/runtime.js';
+	import { Sound } from 'svelte-sound';
+	import clickSound from '@/sounds/click.mp3';
+	import typeSound from '@/sounds/typing-sound.mp3';
+	import { onMount } from 'svelte';
+
+	let type_sound: HTMLAudioElement;
+
+	onMount(() => {
+		type_sound = new Audio(typeSound);
+		type_sound.volume = 0.5; // Set the volume to 50%
+	});
+
+	const click_sound = new Sound(clickSound);
 
 	let code = $state('');
 
+	$effect(() => {
+		// Play typing sound when the code changes
+		if (code.length > 0) {
+			type_sound.currentTime = 0;
+			type_sound.play();
+		}
+		return () => {
+			if (type_sound) {
+				type_sound.pause();
+				type_sound.currentTime = 0;
+			}
+		};
+	});
+
 	async function createGame() {
+		click_sound.play();
 		const { data, error } = await supabase.rpc('create_game');
 		if (error) {
 			console.error(error);
@@ -20,6 +48,7 @@
 	}
 
 	async function joinGame() {
+		click_sound.play();
 		const { error } = await supabase.rpc('join_game', { game_code: code });
 		if (error) {
 			console.error(error);

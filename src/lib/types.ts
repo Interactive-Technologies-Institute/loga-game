@@ -21,7 +21,7 @@ export type CardType = Database["public"]["Enums"]["stop_type"];
 export type Card = {
 	id: number,
 	type: CardType,
-	title: string,
+	title: string | null,
 	text: string,
 }
 

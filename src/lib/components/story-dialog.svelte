@@ -6,6 +6,19 @@
 	import Textarea from './ui/textarea/textarea.svelte';
 	import { m } from '@src/paraglide/messages';
 	import { CARDS } from '../data/cards';
+	import { onMount } from 'svelte';
+	import paperSound from '@/sounds/rustling-paper.mp3';
+	import clickSound from '@/sounds/ui-click.mp3';
+
+	let audio: HTMLAudioElement;
+	let click_sound: HTMLAudioElement;
+
+	onMount(() => {
+		click_sound = new Audio(clickSound);
+		click_sound.volume = 0.5;
+		audio = new Audio(paperSound);
+		audio.volume = 0.5;
+	});
 	interface StoryDialogProps {
 		open: boolean;
 		gameState: GameState;
@@ -19,6 +32,7 @@
 
 	$effect(() => {
 		if (open) {
+			audio.play();
 			setTimeout(() => {
 				const round = document.getElementById(`round-${currentRound}`);
 				if (round) {
@@ -37,12 +51,13 @@
 	let currentAnswer = $state('');
 
 	function onSubmit() {
+		click_sound.play();
 		gameState.submitAnswer(currentAnswer);
 		open = false;
 		currentAnswer = '';
 	}
 
-	function getTranslation(key?: string): string {
+	function getTranslation(key: string | null | undefined): string {
 		if (!key) return ''; // Return an empty string if the key is undefined
 		const translation = m[key as keyof typeof m];
 		if (typeof translation === 'function') {

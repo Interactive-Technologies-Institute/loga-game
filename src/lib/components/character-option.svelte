@@ -6,6 +6,19 @@
 	import { Textarea } from './ui/textarea';
 	import { CHARACTER } from '../data/characters';
 	import { m } from '@src/paraglide/messages.js';
+	import { onMount } from 'svelte';
+	import flipSound from '@/sounds/flipcard.mp3';
+	import clickSound from '@/sounds/click.mp3';
+
+	let click: HTMLAudioElement;
+	let flip: HTMLAudioElement;
+
+	onMount(() => {
+		click = new Audio(clickSound);
+		click.volume = 0.5;
+		flip = new Audio(flipSound);
+		flip.volume = 0.5;
+	});
 
 	interface CharacterOptionProps {
 		character: Character;
@@ -27,12 +40,14 @@
 	let ready = $derived(player?.nickname !== null && player?.description !== null);
 
 	function onSelect() {
+		flip.play();
 		if (taken) return;
 		selected = true;
 		onSelectCallBack();
 	}
 
 	function onReady() {
+		click.play();
 		if (taken) return;
 		onReadyCallBack(nickname, description);
 	}

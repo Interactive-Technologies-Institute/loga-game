@@ -13,6 +13,18 @@
 	import type { PageData } from './$types';
 	import EndDialog from '@/components/end-dialog.svelte';
 	import { m } from '@src/paraglide/messages';
+	import fanfare from '@/sounds/fanfare.mp3';
+	import seagulls from '@/sounds/seagull-sound-effect.mp3';
+	import { onMount } from 'svelte';
+
+	let fanfareAudio: HTMLAudioElement;
+	let startupAudio: HTMLAudioElement;
+	onMount(() => {
+		fanfareAudio = new Audio(fanfare);
+		fanfareAudio.volume = 0.5;
+		startupAudio = new Audio(seagulls);
+		startupAudio.volume = 0.5;
+	});
 
 	let { data }: { data: PageData } = $props();
 
@@ -51,7 +63,14 @@
 	});
 
 	$effect(() => {
+		if (gameState.state === 'starting') {
+			startupAudio.play();
+		}
+	});
+
+	$effect(() => {
 		if (gameState.state === 'finished') {
+			fanfareAudio?.play();
 			openEndDialog = true;
 		}
 	});

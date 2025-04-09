@@ -1,5 +1,23 @@
 <script lang="ts">
-	import { tick } from 'svelte';
+	import { onMount } from 'svelte';
+
+	import rollSound from '@/sounds/dice_roll.mp3';
+
+	let audio: HTMLAudioElement;
+	let audioLoaded = $state(false);
+
+	onMount(async () => {
+		audio = new Audio(rollSound);
+		audio.volume = 0.5;
+
+		// Wait for the audio to be loaded
+		await new Promise((resolve) => {
+			audio.addEventListener('canplaythrough', resolve, { once: true });
+			audio.load();
+		});
+
+		audioLoaded = true;
+	});
 
 	interface DiceProps {
 		round: number;
@@ -9,11 +27,20 @@
 	let { value, round }: DiceProps = $props();
 	let rolling = $state(false);
 	let displayedValue = $state(1);
+	let isFirstRoll = $state(true);
 
 	$effect(() => {
+		if (!audioLoaded && isFirstRoll) {
+			// Skip effect if audio isn't loaded on first roll
+			return;
+		}
 		round;
 		value;
 		rolling = true;
+		if (audio && audioLoaded) {
+			audio.currentTime = 0;
+			audio.play().catch((err) => console.error('Error playing sound:', err));
+		}
 		let interval = setInterval(() => {
 			displayedValue = Math.floor(Math.random() * 6 + 1);
 		}, 250);
@@ -24,7 +51,15 @@
 			displayedValue = value;
 		}, 1000);
 
-		return () => clearInterval(interval);
+		isFirstRoll = false;
+
+		return () => {
+			clearInterval(interval);
+			if (audio) {
+				audio.pause();
+				audio.currentTime = 0;
+			}
+		};
 	});
 </script>
 

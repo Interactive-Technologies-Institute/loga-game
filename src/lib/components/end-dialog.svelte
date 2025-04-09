@@ -3,6 +3,14 @@
 	import * as Dialog from './ui/dialog';
 	import { m } from '@src/paraglide/messages';
 	import { localizeHref } from '@src/paraglide/runtime';
+	import clickSound from '@/sounds/click.mp3';
+	import { onMount } from 'svelte';
+
+	let audio: HTMLAudioElement;
+	onMount(() => {
+		audio = new Audio(clickSound);
+		audio.volume = 0.5;
+	});
 
 	let { open = $bindable(false) } = $props();
 </script>
@@ -13,6 +21,7 @@
 			<p class="text-dark-green rounded-full font-medium text-lg underline">{m.game_ended()}</p>
 			<p class="text-dark-green font-bold text-4xl text-center">{m.thanks_for_playing()}</p>
 		</div>
-		<Button size="lg" href={localizeHref('/')}>{m.play_again()}</Button>
+		<Button size="lg" href={localizeHref('/')} onclick={() => audio.play()}>{m.play_again()}</Button
+		>
 	</Dialog.Content>
 </Dialog.Root>

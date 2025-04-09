@@ -5,6 +5,15 @@
 	import { CHARACTER_OPTIONS } from '@/types';
 	import type { PageData } from './$types';
 	import { m } from '@src/paraglide/messages.js';
+	import clickSound from '@/sounds/click.mp3';
+	import { onMount } from 'svelte';
+
+	let click: HTMLAudioElement;
+
+	onMount(() => {
+		click = new Audio(clickSound);
+		click.volume = 0.5;
+	});
 
 	let { data }: { data: PageData } = $props();
 
@@ -43,7 +52,10 @@
 			class={'mb-5'}
 			size="lg"
 			disabled={gameState.state !== 'ready'}
-			onclick={() => gameState.startGame()}
+			onclick={() => {
+				click.play();
+				gameState.startGame();
+			}}
 		>
 			{m.start_game()}
 		</Button>
