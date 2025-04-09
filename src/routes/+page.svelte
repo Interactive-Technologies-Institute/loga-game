@@ -6,19 +6,20 @@
 	import { m } from '../paraglide/messages.js';
 	import { setLocale, getLocale, localizeUrl } from '../paraglide/runtime.js';
 	import type { Locale } from '../paraglide/runtime.js';
-	import { Sound } from 'svelte-sound';
 	import clickSound from '@/sounds/click.mp3';
 	import typeSound from '@/sounds/typing-sound.mp3';
 	import { onMount } from 'svelte';
+	import type { H } from 'vitest/dist/chunks/environment.LoooBwUu.js';
 
 	let type_sound: HTMLAudioElement;
+	let click_sound: HTMLAudioElement;
 
 	onMount(() => {
 		type_sound = new Audio(typeSound);
 		type_sound.volume = 0.5; // Set the volume to 50%
+		click_sound = new Audio(clickSound);
+		click_sound.volume = 0.5; // Set the volume to 50%
 	});
-
-	const click_sound = new Sound(clickSound);
 
 	let code = $state('');
 
