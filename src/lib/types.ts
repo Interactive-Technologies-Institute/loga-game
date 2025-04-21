@@ -16,35 +16,57 @@ export type Stop = Database['public']['Tables']['stops']['Row'];
 
 export type CardId = Database['public']['Tables']['cards']['Row']['id'];
 
-export type CardType = Database["public"]["Enums"]["stop_type"];
+export type CardType = Database['public']['Enums']['stop_type'];
 
 export type Card = {
-	id: number,
-	type: CardType,
-	title: string | null,
-	text: string,
-}
+	id: number;
+	type: CardType;
+	title: string | null;
+	text: string;
+};
 
 export type Round = Database['public']['Tables']['rounds']['Row'];
 
 export type Character = Database['public']['Enums']['character_type'];
 
+export type CharacterCategory = 'human' | 'non-human';
+
+export const CHARACTER_CATEGORIES: Record<CharacterCategory, Character[]> = {
+	human: [
+		'child',
+		'different-needs',
+		'local-specialist',
+		'nature-lover',
+		'scientist',
+		'time-traveller'
+	],
+	'non-human': [
+		'trocaz-pigeon',
+		'monk-seal',
+		'vulcanic-rock',
+		'iberian-green-frog',
+		'zinos-petrel',
+		'water'
+	]
+};
+
 export const CHARACTER_OPTIONS: Character[] = [
-	'child',
-	'different-needs',
-	'local-specialist',
-	'nature-lover',
-	'non-human-being',
-	'scientist',
-	'time-traveller',
-	'custom'
+	...CHARACTER_CATEGORIES['human'],
+	...CHARACTER_CATEGORIES['non-human']
 ];
 
+export function getCharacterCategory(character: Character): CharacterCategory {
+	if (CHARACTER_CATEGORIES.human.includes(character)) {
+		return 'human';
+	}
+	return 'non-human';
+}
+
 export type CharacterCard = {
-    type: Character;
-    title: string;
-    description: string;
-    secondary?: string;
+	type: Character;
+	title: string;
+	description: string;
+	secondary?: string;
 };
 
 export type PlayerId = Database['public']['Tables']['players']['Row']['id'];

@@ -115,5 +115,5 @@
 		{/if}
 	</p>
 
-	<EndDialog open={openEndDialog} />
+	<EndDialog bind:open={openEndDialog} {gameState} />
 </div>
