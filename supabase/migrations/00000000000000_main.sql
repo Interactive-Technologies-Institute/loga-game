@@ -16,14 +16,21 @@ CREATE TYPE public.game_state AS ENUM (
     'finished'
 );
 CREATE TYPE public.character_type AS ENUM (
+    -- Human characters
     'child',
     'different-needs',
     'local-specialist',
     'nature-lover',
-    'non-human-being',
     'scientist',
     'time-traveller',
-    'custom'
+    
+    -- Non-human characters
+    'trocaz-pigeon',
+    'monk-seal',
+    'vulcanic-rock',
+    'iberian-green-frog',
+    'zinos-petrel',
+    'water'
 );
 -- ===========================================
 -- TABLE DEFINITIONS
