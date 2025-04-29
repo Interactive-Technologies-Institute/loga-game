@@ -81,6 +81,25 @@
 			.map((word) => word.charAt(0).toUpperCase() + word.slice(1))
 			.join(' ');
 	}
+
+	interface ExpandedAnswersMap {
+		[key: string]: boolean;
+	}
+
+	let expandedAnswers = $state<ExpandedAnswersMap>({});
+
+	// Toggle expansion state for an answer
+	function toggleAnswerExpansion(answerId: string) {
+		expandedAnswers = {
+			...expandedAnswers,
+			[answerId]: !expandedAnswers[answerId]
+		};
+	}
+
+	// Check if an answer is expanded
+	function isAnswerExpanded(answerId: string): boolean {
+		return !!expandedAnswers[answerId];
+	}
 </script>
 
 <Dialog.Root bind:open>
@@ -113,20 +132,28 @@
 								</div>
 							</div>
 
-							<div class="divide-y">
+							<div class="flex flex-col items-start pointer w-full">
 								{#each playerData.answers as answer}
-									<div class="p-4">
-										<div class="flex justify-between mb-2">
-											<span class="text-sm font-semibold text-dark-green">
-												{m.round()}
-												{answer.round}
-											</span>
-										</div>
-										<p class="text-sm text-gray-500 italic mb-2">
-											"{getCardText(answer.player_id, answer.round)}"
+									<button
+										class="p-2 w-full text-left hover:bg-gray-100"
+										onclick={() => toggleAnswerExpansion(`${answer.player_id}-${answer.round}`)}
+									>
+										{#if isAnswerExpanded(`${answer.player_id}-${answer.round}`)}
+											<div class="flex gap-4 mb-2 animate-fade-in">
+												<div class="flex gap-1 items-start text-sm font-semibold text-dark-green">
+													<span>{m.round()}</span>
+													<span>{answer.round}</span>
+												</div>
+
+												<p class="text-sm text-gray-500 italic break-words whitespace-pre-wrap">
+													"{getCardText(answer.player_id, answer.round)}"
+												</p>
+											</div>
+										{/if}
+										<p class="px-4 text-left w-full break-words whitespace-pre-wrap">
+											{answer.answer}
 										</p>
-										<p class="whitespace-pre-line">{answer.answer}</p>
-									</div>
+									</button>
 								{/each}
 							</div>
 						</div>
@@ -141,3 +168,20 @@
 		>
 	</Dialog.Content>
 </Dialog.Root>
+
+<style>
+	.animate-fade-in {
+		animation: fadeIn 0.2s ease-in-out;
+	}
+
+	@keyframes fadeIn {
+		from {
+			opacity: 0;
+			transform: translateY(-5px);
+		}
+		to {
+			opacity: 1;
+			transform: translateY(0);
+		}
+	}
+</style>
