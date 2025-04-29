@@ -138,29 +138,21 @@
 										class="p-2 w-full text-left hover:bg-gray-100"
 										onclick={() => toggleAnswerExpansion(`${answer.player_id}-${answer.round}`)}
 									>
-										<!-- <div class="flex justify-between mb-2">
-												<span class="text-sm font-semibold text-dark-green">
-												{m.round()}
-												{answer.round}
-											</span>
-										</div>
-										<p class="text-sm text-gray-500 italic mb-2">
-											"{getCardText(answer.player_id, answer.round)}"
-										</p> -->
-										<p>{answer.answer}</p>
 										{#if isAnswerExpanded(`${answer.player_id}-${answer.round}`)}
-											<div class="flex pt-2 border-t mt-2 text-sm text-gray-600 animate-fade-in">
-												<div class="flex items-center justify-between mb-2">
-													<span class="font-semibold text-dark-green">
-														{m.round()}
-														{answer.round}
-													</span>
+											<div class="flex gap-4 mb-2 animate-fade-in">
+												<div class="flex gap-1 items-start text-sm font-semibold text-dark-green">
+													<span>{m.round()}</span>
+													<span>{answer.round}</span>
 												</div>
-												<p class="italic mb-2 p-2">
+
+												<p class="text-sm text-gray-500 italic break-words whitespace-pre-wrap">
 													"{getCardText(answer.player_id, answer.round)}"
 												</p>
 											</div>
 										{/if}
+										<p class="px-4 text-left w-full break-words whitespace-pre-wrap">
+											{answer.answer}
+										</p>
 									</button>
 								{/each}
 							</div>
