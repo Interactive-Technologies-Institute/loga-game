@@ -14,6 +14,10 @@ body {
 	}
 }
 
+:root {
+	font-family: RobotoSlabVariable, serif;
+}
+
 @font-face {
 	font-family: 'RobotoSlabVariable';
 	font-weight: 100 900;

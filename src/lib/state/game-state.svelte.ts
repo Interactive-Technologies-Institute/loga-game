@@ -197,6 +197,25 @@ export class GameState {
 
 		const stopId = currentMove?.stop_id ?? previousMove?.stop_id;
 
+		// Round 0 - Introduction
+		if (this.currentRound === 0) {
+			if (!stopId) {
+				return { state: 'starting', stop_id: undefined };
+			}
+			return !currentAnswer
+				? { state: 'writing', stop_id: stopId }
+				: { state: 'done', stop_id: stopId };
+		}
+
+		// Round 7 - Reflection
+		if (this.currentRound === 7) {
+			const lastStopId = moves.find((move) => move.round === 6)?.stop_id || 1;
+			return !currentAnswer
+				? { state: 'writing', stop_id: lastStopId }
+				: { state: 'done', stop_id: lastStopId };
+		}
+
+		// Normal rounds (1-6)
 		if (!stopId) {
 			return { state: 'starting', stop_id: undefined };
 		} else if (!currentMove && !currentCard && !currentAnswer) {

@@ -103,7 +103,10 @@
 </script>
 
 <Dialog.Root bind:open>
-	<Dialog.Content class="overflow-y-auto max-h-[90vh] sm:max-w-[60rem] flex flex-col">
+	<Dialog.Content
+		interactOutsideBehavior="ignore"
+		class="overflow-y-auto max-h-[90vh] sm:max-w-[60rem] flex flex-col"
+	>
 		<div class="flex flex-col items-center justify-center gap-1 p-2">
 			<p class="text-dark-green rounded-full font-medium text-lg underline">{m.game_ended()}</p>
 			<p class="text-dark-green font-bold text-4xl text-center">{m.thanks_for_playing()}</p>

@@ -24,6 +24,7 @@
 		character: Character;
 		player: Player | undefined;
 		selected: boolean;
+		disabled: boolean;
 		onSelect: () => void;
 		onReady: (nickname: string, description: string) => void;
 	}
@@ -32,6 +33,7 @@
 		character,
 		player,
 		selected = $bindable(),
+		disabled,
 		onSelect: onSelectCallBack,
 		onReady: onReadyCallBack
 	}: CharacterOptionProps = $props();
@@ -74,7 +76,11 @@
 	}
 </script>
 
-<div class="w-64 h-96 [perspective:1000px]">
+<div
+	class="w-64 h-96 [perspective:1000px] {taken || disabled
+		? 'opacity-50 grayscale pointer-events-none'
+		: ''}"
+>
 	<div
 		class={`relative w-full h-full transition-transform duration-700 [transform-style:preserve-3d] ${
 			selected ? '[transform:rotateY(180deg)]' : ''
@@ -83,10 +89,10 @@
 		<!-- Front of card -->
 		<button
 			class={`absolute inset-0 w-full h-full transform transition-transform rounded-lg overflow-hidden [backface-visibility:hidden] ${
-				taken ? 'cursor-not-allowed' : 'hover:rotate-2 focus:rotate-2'
+				taken || disabled ? 'cursor-not-allowed' : 'hover:rotate-2 focus:rotate-2'
 			}`}
-			onclick={!taken ? onSelect : undefined}
-			disabled={taken}
+			onclick={!taken && !disabled ? onSelect : undefined}
+			{disabled}
 		>
 			<img
 				src={`/images/characters/cards/${character}.svg`}
@@ -107,9 +113,14 @@
 		<div
 			class="absolute inset-0 w-full h-full rounded-lg p-4 bg-white border-2 border-dark-green [backface-visibility:hidden] [transform:rotateY(180deg)] flex flex-col gap-y-2"
 		>
-			<Input placeholder={m.nickname()} bind:value={nickname} />
-			<Textarea placeholder={m.description()} class="flex-grow" bind:value={description} />
-			<Button onclick={onReady}>{m.ready()}</Button>
+			<Input placeholder={m.nickname()} bind:value={nickname} disabled={ready} />
+			<Textarea
+				placeholder={m.description()}
+				class="flex-grow"
+				bind:value={description}
+				disabled={ready}
+			/>
+			<Button onclick={onReady} disabled={ready}>{m.ready()}</Button>
 		</div>
 	</div>
 	{#if taken || selected}
