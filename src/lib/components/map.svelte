@@ -3,6 +3,7 @@
 	import type { MapPosition } from '@/state/map-position.svelte';
 	import type { PlayerId, StopId } from '@/types';
 	import Stop from './stop.svelte';
+	import { onMount } from 'svelte';
 
 	interface MapProps {
 		gameState: GameState;
@@ -37,15 +38,46 @@
 			}
 		}
 	}
+
+	let mapContainer: HTMLDivElement;
+
+	onMount(() => {
+		const resizeObserver = new ResizeObserver((entries) => {
+			for (const entry of entries) {
+				const { width, height } = entry.contentRect;
+				position.setContainerSize(width, height);
+			}
+		});
+
+		resizeObserver.observe(mapContainer);
+
+		return () => {
+			resizeObserver.disconnect();
+		};
+	});
 </script>
 
-<div class="bg-[#D8EFF4] w-full h-full overflow-hidden">
+<div class="bg-[#D8EFF4] w-full h-full overflow-hidden" bind:this={mapContainer}>
 	<div
-		class="origin-center transition-transform relative w-full h-full"
+		class="origin-center transition-transform relative w-full h-full {position.hasMovedBeyondThreshold
+			? 'cursor-grabbing'
+			: 'cursor-grab'}"
 		style={`transform: scale(${position.scale}) translate(${position.x}px, ${position.y}px);`}
 	>
-		<img src="/images/map.svg" alt="Game Map" class="w-full h-full" />
-		<svg viewBox="0 0 2834.65 2267.72" class="absolute inset-0 w-full h-full">
+		<div class="absolute h-[50vh] w-[70vw] inset-0 m-auto pointer-events-none map-highlight"></div>
+		<img
+			src="/images/map.svg"
+			alt="Game Map"
+			class="w-full h-full pointer-events-none"
+			draggable="false"
+		/>
+		<svg
+			viewBox="0 0 2834.65 2267.72"
+			class="absolute inset-0 w-full h-full"
+			style="pointer-events: {position.hasMovedBeyondThreshold || position.dragEnded
+				? 'none'
+				: 'auto'}"
+		>
 			{#each gameState.stops as stop (stop.id)}
 				{@const selectable = selectableStops.includes(stop.id)}
 				<Stop {stop} {selectable} onSelect={handleStopClick} />
@@ -60,16 +92,47 @@
 								: 0
 					)}
 				{#each playersHere as [_, player], i}
+					{@const xPos = stop.x - 24 + i * 20 + (selectable ? 15 : 0)}
+					{@const yPos = stop.y - 24}
+					{@const isCurrentPlayer = player.id === gameState.playerId}
+
+					<!-- Background circle -->
+					<circle
+						cx={xPos + 24}
+						cy={yPos + 24}
+						r="28"
+						class="fill-white drop-shadow-xl {isCurrentPlayer ? 'animate-pulse-badge' : ''}"
+					/>
+
+					<!-- Player badge image -->
 					<image
 						href="/images/characters/badges/{player.character}.svg"
-						x={stop.x - 15 + i * 15 + (selectable ? 15 : 0)}
-						y={stop.y - 15}
-						width="30"
-						height="30"
-						class="rounded-full"
+						x={xPos}
+						y={yPos}
+						width="48"
+						height="48"
+						class="relative z-10 {isCurrentPlayer ? 'animate-pulse-badge' : ''}"
 					/>
 				{/each}
 			{/each}
 		</svg>
 	</div>
 </div>
+
+<style>
+	@keyframes pulse-badge {
+		0%,
+		100% {
+			transform: scale(1);
+		}
+		50% {
+			transform: scale(1.2);
+		}
+	}
+
+	.animate-pulse-badge {
+		animation: pulse-badge 2s ease-in-out infinite;
+		transform-origin: center;
+		transform-box: fill-box;
+	}
+</style>

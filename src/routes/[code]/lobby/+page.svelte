@@ -75,7 +75,7 @@
 					onclick={() => selectCategory('human')}
 				>
 					<div class="w-24 h-24 mb-4 rounded-full bg-primary-100 flex items-center justify-center">
-						<img src={`/images/characters/badges/custom.svg`} alt="" />
+						<img src={`/images/characters/badges/nature-lover.svg`} alt="" />
 					</div>
 					<h3 class="text-3xl font-bold text-dark-green mb-2">{m.human()}</h3>
 					<p class="text-sm text-center italic text-gray-500">
@@ -95,7 +95,7 @@
 					onclick={() => selectCategory('non-human')}
 				>
 					<div class="w-24 h-24 mb-4 rounded-full bg-primary-100 flex items-center justify-center">
-						<img src={`/images/characters/badges/custom.svg`} alt="" />
+						<img src={`/images/characters/badges/trocaz-pigeon.svg`} alt="" />
 					</div>
 					<h3 class="text-3xl font-bold text-dark-green mb-2">{m.non_human()}</h3>
 					<p class="text-sm text-center italic text-gray-500">
@@ -116,10 +116,12 @@
 		<div class="grid grid-cols-3 gap-6 mb-10">
 			{#each CHARACTER_CATEGORIES[selectedCategory ?? 'human'] as character}
 				{@const player = gameState.players.find((player) => player.character === character)}
+				{@const isReady = currentPlayer.nickname !== null}
 				<CharacterOption
 					{character}
 					{player}
 					selected={currentPlayer.character === character}
+					disabled={isReady && currentPlayer.character !== character}
 					onSelect={() => gameState.updatePlayerCharacter(character)}
 					onReady={(nickname, description) =>
 						gameState.updatePlayerNicknameDescription(nickname, description)}
@@ -137,8 +139,12 @@
 	</p>
 	{#if selectionStep === 'character' && currentPlayer.is_owner}
 		<div class="flex items-center justify-center gap-3 mb-5">
-			<Button variant={'outline'} size="lg" onclick={goBackToCategories} class="mr-2"
-				>{m.back()}</Button
+			<Button
+				variant={'outline'}
+				size="lg"
+				onclick={goBackToCategories}
+				class="mr-2"
+				disabled={currentPlayer.nickname !== null}>{m.back()}</Button
 			>
 			<Button
 				size="lg"

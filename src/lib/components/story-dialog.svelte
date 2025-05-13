@@ -4,11 +4,18 @@
 	import { Button } from './ui/button';
 	import * as Dialog from './ui/dialog';
 	import Textarea from './ui/textarea/textarea.svelte';
+	import CharacterCard from './character-card.svelte';
 	import { m } from '@src/paraglide/messages';
 	import { CARDS } from '../data/cards';
+	import { ROUNDS } from '../data/rounds';
 	import { onMount } from 'svelte';
 	import paperSound from '@/sounds/rustling-paper.mp3';
 	import clickSound from '@/sounds/ui-click.mp3';
+	import { Flag } from 'lucide-svelte';
+	import Timer from './timer.svelte';
+	import PostStory from './post-story-icon.svelte';
+
+	let timerMinutes: number = $state(2);
 
 	let audio: HTMLAudioElement;
 	let click_sound: HTMLAudioElement;
@@ -30,8 +37,17 @@
 		return gameState.gameRounds.find((round) => round.round === gameState.currentRound)?.round;
 	});
 
+	let sortedRounds = $derived.by(() => {
+		return gameState.rounds.sort((a, b) => a.index - b.index);
+	});
+
+	let player = $derived.by(() => {
+		return gameState.players.find((player) => player.id === gameState.playerId);
+	});
 	$effect(() => {
 		if (open) {
+			timerMinutes = Math.floor(Math.random() * 3) + 2;
+
 			audio.play();
 			setTimeout(() => {
 				const round = document.getElementById(`round-${currentRound}`);
@@ -67,43 +83,103 @@
 			return 'Translation missing';
 		}
 	}
+
+	function handleTimeUp() {
+		if (currentAnswer) {
+			onSubmit();
+		} else {
+			open = false;
+		}
+	}
 </script>
 
 <Dialog.Root bind:open>
-	<Dialog.Content class="overflow-y-auto max-h-[80vh] sm:max-w-[60rem] flex flex-col gap-y-10">
-		{#each gameState.rounds as round (round.index)}
+	<Dialog.Content
+		interactOutsideBehavior="ignore"
+		class="overflow-y-auto flex flex-col gap-y-10 max-h-[80vh] sm:max-w-[60rem]"
+	>
+		{#each sortedRounds as round (round.index)}
 			{@const card_id = playerCards.find((card) => card.round === round.index)?.card_id}
 			{@const card = CARDS.find((card) => card.id === card_id)}
 			{@const answer = playerAnswers.find((answer) => answer.round === round.index)}
-			<div id={`round-${round.index}`} class="flex flex-row items-stretch gap-x-8">
-				{#if card}
+			<div
+				id={`round-${round.index}`}
+				class="flex flex-row items-stretch gap-x-8 {round.index > (currentRound ?? -1)
+					? 'opacity-30 grayscale'
+					: ''}"
+			>
+				{#if round.index === 0}
+					<div class="shrink-0">
+						<CharacterCard character={player?.character ?? 'child'} />
+					</div>
+				{:else if round.index === 7}
+					<div class="shrink-0">
+						<div
+							class="w-64 h-96 bg-white rounded-xl bg-cover bg-center border-2 border-gray-400/50 relative"
+							style="background-image: url('/images/cards/post-story.svg');"
+						>
+							<div class="absolute inset-0 mb-28 px-4 flex flex-col justify-end text-center gap-3">
+								<h3 class={`text-2xl font-bold text-white`}>{m.post_story()}</h3>
+								<p class="text-xs font-medium">{m.write_post_story()}</p>
+							</div>
+						</div>
+					</div>
+				{:else if card}
 					<div class="shrink-0">
 						<Card {card} />
 					</div>
 				{:else}
 					<div
-						class="w-64 h-96 rounded-lg shrink-0 border-dashed border-2 border-primary flex items-center justify-center"
+						class="w-64 h-96 rounded-lg shrink-0 border-black border-dashed border-2 flex items-center justify-center"
 					>
-						<p class="text-sm text-primary text-center">{m.card_not_selected()}</p>
+						<p class="text-sm text-center">{m.card_not_selected()}</p>
 					</div>
 				{/if}
 				<div class="flex flex-col items-stretch w-full">
-					<p class="text-lg font-bold text-secondary">
-						{round.index}. {getTranslation(card?.title)}
-					</p>
-					<p class="text-sm max-w-lg text-balance">
-						{getTranslation(card?.text)}
+					<div class="flex items-center gap-2">
+						{#if round.index === 0}
+							<div class="w-8 h-8 rounded-full bg-[#FF6157] grid place-items-center">
+								<Flag class="w-4 h-4 text-white flex items-center justify-center" />
+							</div>
+						{:else if round.index === 7}
+							<div class="w-8 h-8 rounded-full bg-dark-green grid place-items-center">
+								<div class="w-4 h-4 flex items-center justify-center">
+									<PostStory color={'white'} />
+								</div>
+							</div>
+						{:else}
+							<div class="w-8 h-8 rounded-full bg-dark-green grid place-items-center">
+								<span
+									class="text-white font-medium text-center text-base flex items-center justify-center"
+									>{round.index}</span
+								>
+							</div>
+						{/if}
+						<p class="text-xl font-bold text-dark-green">
+							{getTranslation(ROUNDS[round.index].title)}
+						</p>
+					</div>
+					<p class="font-medium py-1">
+						{getTranslation(ROUNDS[round.index].description)}
 					</p>
 					{#if round.index === currentRound}
-						<div class="flex-1 relative">
+						<div class="flex-1 relative mb-4">
 							<Textarea class="h-full mt-2" bind:value={currentAnswer} />
-							<Button class="absolute bottom-2 right-4" onclick={onSubmit}>{m.submit()}</Button>
+						</div>
+						<div class=" flex items-center justify-between gap-3 bg-white">
+							{#if open}
+								<Timer minutes={timerMinutes} onTimeUp={handleTimeUp} />
+							{/if}
+							<Button onclick={onSubmit}>{m.submit()}</Button>
 						</div>
 					{:else}
 						<Textarea class="flex-1 mt-2" value={answer?.answer ?? ''} disabled />
 					{/if}
 				</div>
 			</div>
+			{#if round.index === 0 || round.index === 6}
+				<div class="h-0.5 border-t-2 border-gray-200"></div>
+			{/if}
 		{/each}
 	</Dialog.Content>
 </Dialog.Root>

@@ -34,12 +34,9 @@
 </script>
 
 {#if selectable}
-	<circle
-		cx={stop.x}
-		cy={stop.y}
-		r="16"
-		class="fill-white stroke-white stroke-2 hover:fill-white animate-pulse origin-center"
-	/>
+	<circle cx={stop.x} cy={stop.y} r="24" class="fill-[#FF6157] expand-fade" />
+	<circle cx={stop.x} cy={stop.y} r="24" class="fill-[#FF6157] expand-fade-delayed" />
+	<circle cx={stop.x} cy={stop.y} r="8" class="pulse-red" />
 	<circle
 		role="button"
 		tabindex="0"
@@ -52,3 +49,42 @@
 		class="fill-transparent cursor-pointer"
 	/>
 {/if}
+
+<style>
+	@keyframes pulse-red {
+		0%,
+		100% {
+			fill: #ff6157;
+		}
+		25% {
+			fill: white;
+		}
+	}
+
+	@keyframes expand-fade {
+		0% {
+			transform: scale(1);
+			opacity: 1;
+		}
+		100% {
+			transform: scale(3);
+			opacity: 0;
+		}
+	}
+
+	.pulse-red {
+		animation: pulse-red 2s infinite;
+	}
+
+	.expand-fade {
+		animation: expand-fade 2s infinite;
+		transform-box: fill-box;
+		transform-origin: center;
+	}
+	.expand-fade-delayed {
+		animation: expand-fade 2s infinite;
+		animation-delay: 0.25s;
+		transform-box: fill-box;
+		transform-origin: center;
+	}
+</style>

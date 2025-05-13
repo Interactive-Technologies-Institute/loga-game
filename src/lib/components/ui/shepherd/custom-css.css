@@ -1,0 +1,68 @@
+@import 'tailwindcss/base';
+@import 'tailwindcss/components';
+@import 'tailwindcss/utilities';
+
+/* Main container */
+.shepherd-element {
+	@apply !max-w-[45vw];
+	@apply !max-h-[90vh];
+	@apply !shadow-2xl;
+}
+
+/* Content area */
+.shepherd-element .shepherd-content {
+	@apply !text-pretty;
+}
+
+/* Header */
+.shepherd-element .shepherd-header {
+	@apply !bg-white;
+}
+
+/* Title */
+.shepherd-element .shepherd-title {
+	@apply text-2xl font-bold text-dark-green;
+}
+
+/* Close button */
+.shepherd-element .shepherd-cancel-icon {
+	@apply !text-dark-green hover:!text-dark-green/60 transition-colors;
+}
+
+/* Main text content */
+.shepherd-element .shepherd-text {
+	@apply text-base font-medium text-black;
+}
+
+/* Footer area */
+.shepherd-element .shepherd-footer {
+}
+
+/* Buttons */
+.shepherd-element .shepherd-button {
+	@apply bg-dark-green hover:bg-dark-green/90 text-white px-4 py-2 rounded-md text-base font-medium transition-colors;
+}
+
+/* Modal overlay */
+.shepherd-modal-overlay-container {
+}
+.shepherd-arrow::before {
+	@apply !bg-white;
+}
+
+.shepherd-footer {
+	align-items: center;
+	border-bottom-left-radius: 5px;
+	border-bottom-right-radius: 5px;
+	display: flex;
+	justify-content: space-between;
+	padding: 0 0.75rem 0.75rem;
+
+	.shepherd-button:last-child {
+		margin-right: 0;
+	}
+
+	.shepherd-progress {
+		@apply text-dark-green font-bold;
+	}
+}
