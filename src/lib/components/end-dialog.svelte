@@ -9,6 +9,8 @@
 	import type { Player, PlayerAnswer } from '@/types';
 	import { CARDS } from '../data/cards';
 	import { CHARACTER } from '../data/characters';
+	import { Label, Switch } from 'bits-ui';
+	import { goto } from '$app/navigation';
 
 	let audio: HTMLAudioElement;
 	onMount(() => {
@@ -100,75 +102,165 @@
 	function isAnswerExpanded(answerId: string): boolean {
 		return !!expandedAnswers[answerId];
 	}
+
+	let saveStory = $state(true);
+	let playerName = $state('');
+	let storyTitle = $state('');
+
+	async function handleGameEnd() {
+		audio.play();
+		if (!saveStory) {
+			console.log('Story not saved. Returning to main menu.');
+			// goto(localizeHref('/'));
+		} else {
+			// Logic to save the story
+			const id = await gameState.saveStory(playerName, storyTitle);
+			goto(localizeHref(`/stories/${id}`));
+			// Reset the form
+			playerName = '';
+			storyTitle = '';
+		}
+	}
 </script>
 
 <Dialog.Root bind:open>
 	<Dialog.Content
 		interactOutsideBehavior="ignore"
-		class="overflow-y-auto max-h-[90vh] sm:max-w-[60rem] flex flex-col"
+		class="overflow-y-auto max-h-[80vh] w-fit max-w-[90vw] flex flex-col"
 	>
-		<div class="flex flex-col items-center justify-center gap-1 p-2">
+		<div class="flex flex-col items-center justify-center gap-1">
 			<p class="text-dark-green rounded-full font-medium text-lg underline">{m.game_ended()}</p>
 			<p class="text-dark-green font-bold text-4xl text-center">{m.thanks_for_playing()}</p>
 		</div>
-		<h2 class="text-xl font-bold text-dark-green">{m.your_story()}</h2>
-		<div class="overflow-y-auto border-2 border-dark-green rounded-lg">
-			{#if Object.keys(storiesByPlayer).length > 0}
-				<div class="space-y-8">
-					{#each Object.values(storiesByPlayer) as playerData}
-						<div class="border rounded-lg overflow-hidden">
-							<div class="bg-gray-50 p-4 flex items-center gap-3 border-b">
-								<div class="w-16 h-16 rounded-full overflow-hidden flex-shrink-0">
-									<img
-										src={`/images/characters/badges/${playerData.player.character}.svg`}
-										alt={playerData.player.character}
-										class="w-full h-full object-cover"
-									/>
-								</div>
-								<div>
-									<h3 class="font-bold text-2xl text-dark-green">{playerData.player.nickname}</h3>
-									<p class="text-sm text-gray-500 capitalize">
-										{playerData.player.character
-											? getCharacterName(playerData.player.character)
-											: 'Unknown Character'}
-									</p>
-								</div>
-							</div>
+		<div class="flex flex-col lg:flex-row gap-4 p-4 h-full">
+			<div
+				class="overflow-y-auto flex flex-col flex-grow border-2 border-dark-green rounded-lg w-[75ch] h-full"
+			>
+				<h2 class="text-xl font-bold text-dark-green p-2">{m.your_story()}</h2>
 
-							<div class="flex flex-col items-start pointer w-full">
-								{#each playerData.answers as answer}
-									<button
-										class="p-2 w-full text-left hover:bg-gray-100"
-										onclick={() => toggleAnswerExpansion(`${answer.player_id}-${answer.round}`)}
-									>
-										{#if isAnswerExpanded(`${answer.player_id}-${answer.round}`)}
-											<div class="flex gap-4 mb-2 animate-fade-in">
-												<div class="flex gap-1 items-start text-sm font-semibold text-dark-green">
-													<span>{m.round()}</span>
-													<span>{answer.round}</span>
-												</div>
-
-												<p class="text-sm text-gray-500 italic break-words whitespace-pre-wrap">
-													"{getCardText(answer.player_id, answer.round)}"
-												</p>
-											</div>
-										{/if}
-										<p class="px-4 text-left w-full break-words whitespace-pre-wrap">
-											{answer.answer}
+				{#if Object.keys(storiesByPlayer).length > 0}
+					<div class="space-y-8">
+						{#each Object.values(storiesByPlayer) as playerData}
+							<div class="border rounded-lg overflow-hidden">
+								<div class="bg-gray-50 p-4 flex items-center gap-3 border-b">
+									<div class="w-16 h-16 rounded-full overflow-hidden flex-shrink-0">
+										<img
+											src={`/images/characters/badges/${playerData.player.character}.svg`}
+											alt={playerData.player.character}
+											class="w-full h-full object-cover"
+										/>
+									</div>
+									<div>
+										<h3 class="font-bold text-2xl text-dark-green">{playerData.player.nickname}</h3>
+										<p class="text-sm text-gray-500 capitalize">
+											{playerData.player.character
+												? getCharacterName(playerData.player.character)
+												: 'Unknown Character'}
 										</p>
-									</button>
-								{/each}
+									</div>
+								</div>
+
+								<div class="flex flex-col items-start pointer w-full">
+									{#each playerData.answers as answer}
+										<button
+											class="p-2 w-full text-left hover:bg-gray-100"
+											onclick={() => toggleAnswerExpansion(`${answer.player_id}-${answer.round}`)}
+										>
+											{#if isAnswerExpanded(`${answer.player_id}-${answer.round}`)}
+												<div class="flex gap-4 mb-2 animate-fade-in">
+													{#if answer.round === 0}
+														<div
+															class="flex gap-1 items-start text-sm font-semibold text-dark-green"
+														>
+															<span>{m.intro()}</span>
+														</div>
+													{:else if answer.round === 7}
+														<div
+															class="flex gap-1 items-start text-sm font-semibold text-dark-green"
+														>
+															<span>{m.post_story()}</span>
+														</div>
+													{:else}
+														<div
+															class="flex gap-1 items-start text-sm font-semibold text-dark-green"
+														>
+															<span>{m.round()}</span>
+															<span>{answer.round}</span>
+														</div>
+														<p class="text-sm text-gray-500 italic break-words whitespace-pre-wrap">
+															"{getCardText(answer.player_id, answer.round)}"
+														</p>
+													{/if}
+												</div>
+											{/if}
+											<p class="px-4 text-left w-full break-words whitespace-pre-wrap">
+												{answer.answer}
+											</p>
+										</button>
+									{/each}
+								</div>
 							</div>
-						</div>
-					{/each}
+						{/each}
+					</div>
+				{:else}
+					<p class="text-center text-gray-500">Error</p>
+				{/if}
+			</div>
+			<div class="flex flex-col shrink-1 gap-4 min-h-full">
+				<div class="flex flex-col gap-4">
+					<p>Do you want to save your story and share with other players?</p>
+					<div class="flex items-center gap-2">
+						<Label.Root for="dnd" class="text-base font-medium">Save story</Label.Root>
+						<Switch.Root
+							id="save-story"
+							bind:checked={saveStory}
+							name="save-story"
+							class="focus-visible:ring-foreground focus-visible:ring-offset-background data-[state=checked]:bg-dark-green data-[state=unchecked]:bg-gray-300 data-[state=unchecked]:shadow-mini-inset focus-visible:outline-hidden peer inline-flex h-[36px] min-h-[36px] w-[60px] shrink-0 cursor-pointer items-center rounded-full px-[3px] transition-colors focus-visible:ring-2 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+						>
+							<Switch.Thumb
+								class="bg-white data-[state=unchecked]:shadow-mini pointer-events-none block size-[30px] shrink-0 rounded-full transition-transform data-[state=checked]:translate-x-6 data-[state=unchecked]:translate-x-0"
+							/>
+						</Switch.Root>
+					</div>
 				</div>
-			{:else}
-				<p class="text-center text-gray-500">Error</p>
-			{/if}
+				{#if saveStory}
+					<div class="flex flex-col gap-4">
+						<span class="flex w-fit text-sm text-gray-500">
+							Please fill out the form to save your story.
+						</span>
+						<form class="flex flex-col min-h-full gap-4">
+							<div>
+								<label for="name" class="text-sm font-medium text-gray-700">Player name</label>
+								<input
+									required
+									bind:value={playerName}
+									type="text"
+									id="name"
+									class="mt-1 w-full border-gray-300 border-2 p-2 rounded-md focus:ring-dark-green focus:border-dark-green focus:outline-none"
+									placeholder="Enter your name"
+								/>
+							</div>
+							<div>
+								<label for="title" class="text-sm font-medium text-gray-700">Story title</label>
+								<input
+									required
+									bind:value={storyTitle}
+									type="text"
+									id="title"
+									class="mt-1 p-2 w-full border-gray-300 rounded-md border-2 focus:ring-dark-green focus:border-dark-green focus:outline-none"
+									placeholder="Enter a title for your story"
+								/>
+							</div>
+						</form>
+					</div>
+				{:else}
+					<p class="text-sm text-red-500">*Your story will be deleted.</p>
+				{/if}
+				<Button class="p-2 flex" size="lg" onclick={handleGameEnd}>
+					{saveStory ? 'Save story' : 'Return to main menu'}
+				</Button>
+			</div>
 		</div>
-		<Button class="p-2" size="lg" href={localizeHref('/')} onclick={() => audio.play()}
-			>{m.play_again()}</Button
-		>
 	</Dialog.Content>
 </Dialog.Root>
 

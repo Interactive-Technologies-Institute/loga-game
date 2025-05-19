@@ -45,7 +45,7 @@
 		return gameState.players.find((player) => player.id === gameState.playerId);
 	});
 	$effect(() => {
-		if (open) {
+		if (open && playerState === 'writing') {
 			timerMinutes = Math.floor(Math.random() * 3) + 2;
 
 			audio.play();
@@ -67,10 +67,12 @@
 	let currentAnswer = $state('');
 
 	function onSubmit() {
-		click_sound.play();
-		gameState.submitAnswer(currentAnswer);
-		open = false;
-		currentAnswer = '';
+		if (playerState === 'writing') {
+			click_sound.play();
+			gameState.submitAnswer(currentAnswer);
+			open = false;
+			currentAnswer = '';
+		}
 	}
 
 	function getTranslation(key: string | null | undefined): string {
@@ -91,6 +93,9 @@
 			open = false;
 		}
 	}
+	let playerState = $derived.by(() => {
+		return gameState.playersState[gameState.playerId].state;
+	});
 </script>
 
 <Dialog.Root bind:open>
@@ -162,12 +167,12 @@
 					<p class="font-medium py-1">
 						{getTranslation(ROUNDS[round.index].description)}
 					</p>
-					{#if round.index === currentRound}
+					{#if round.index === currentRound && playerState === 'writing'}
 						<div class="flex-1 relative mb-4">
 							<Textarea class="h-full mt-2" bind:value={currentAnswer} />
 						</div>
 						<div class=" flex items-center justify-between gap-3 bg-white">
-							{#if open}
+							{#if open && playerState === 'writing'}
 								<Timer minutes={timerMinutes} onTimeUp={handleTimeUp} />
 							{/if}
 							<Button onclick={onSubmit}>{m.submit()}</Button>

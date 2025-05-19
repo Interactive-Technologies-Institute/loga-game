@@ -98,3 +98,28 @@ export type PlayerState =
 			state: 'done';
 			stop_id: StopId;
 	  };
+
+export type StoryCharacter = {
+	type: Character;
+	nickname: string;
+	description: string;
+};
+
+export type StoryRound = {
+	round: number;
+	card_id: number | null;
+	type: CardType | null;
+	answer: string | null;
+};
+
+export type SavedStory = {
+	id: number;
+	story_id: string;
+	created_at: string;
+	player_name: string;
+	story_title: string;
+	character: StoryCharacter;
+	rounds: Record<string, StoryRound>;
+	card_types: string[];
+	full_story: string;
+};

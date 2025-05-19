@@ -259,6 +259,67 @@ export class GameState {
 		}
 	}
 
+	async saveStory(name: string, title: string) {
+		const character = this.players.find((player) => player.id === this.playerId);
+		if (!character) return;
+
+		// Build rounds data with card types and answers
+		const roundsData = Array.from({ length: 8 }, (_, i) => {
+			const card = this.playersCards.find((pc) => pc.player_id === this.playerId && pc.round === i);
+			const cardDetails = card ? this.cards.find((c) => c.id === card.card_id) : null;
+			const answer = this.playersAnswers.find(
+				(pa) => pa.player_id === this.playerId && pa.round === i
+			);
+
+			return {
+				round: i,
+				card_id: card?.card_id || null,
+				type: cardDetails?.type || null,
+				answer: answer?.answer || ''
+			};
+		}).reduce<Record<number, { card_id: number | null; type: string | null; answer: string }>>(
+			(acc, round, index) => {
+				acc[index] = round;
+				return acc;
+			},
+			{}
+		);
+
+		// Get unique card types
+		const cardTypes = Array.from(
+			new Set(
+				Object.values(roundsData)
+					.map((round) => round.type)
+					.filter((type): type is string => type !== null)
+			)
+		);
+
+		// Combine all answers into full story
+		const fullStory = Object.values(roundsData)
+			.map((round) => round.answer)
+			.filter((answer) => answer.trim().length > 0)
+			.join('\n\n');
+
+		const { data, error } = await supabase.rpc('save_story', {
+			p_player_name: name,
+			p_story_title: title,
+			p_character: {
+				type: character.character,
+				nickname: character.nickname,
+				description: character.description
+			},
+			p_rounds: roundsData,
+			p_card_types: cardTypes,
+			p_full_story: fullStory
+		});
+
+		if (error) {
+			console.error('Error saving story:', error);
+			return false;
+		}
+
+		return data;
+	}
 	getInitialStops(): StopId[] {
 		return this.stops.filter((stop) => stop.initial).map((stop) => stop.id);
 	}

@@ -5,9 +5,10 @@
 
 	interface CharacterCardProps {
 		character: Character;
+		className?: string;
 	}
 
-	let { character }: CharacterCardProps = $props();
+	let { character, className = '' }: CharacterCardProps = $props();
 
 	let characterDetails = CHARACTER.find((c) => c.type === character);
 
@@ -22,11 +23,11 @@
 </script>
 
 <div
-	class="w-64 h-96 bg-white rounded-xl bg-cover bg-center border-2 border-gray-400/50 relative"
+	class="w-64 h-96 bg-white rounded-xl bg-cover bg-center border-2 border-gray-400/50 relative {className}"
 	style="background-image: url('/images/characters/cards/{character}.svg');"
 >
 	<div class="absolute inset-0 mb-2 px-1 pb-2 flex flex-col justify-end text-center gap-2">
-		<h3 class={`text-2xl font-bold text-dark-green`}>
+		<h3 class={`text-sm lg:text-2xl font-bold text-dark-green`}>
 			{getTranslation(characterDetails?.title)}
 		</h3>
 		<p class="text-xs font-medium">{getTranslation(characterDetails?.description)}</p>

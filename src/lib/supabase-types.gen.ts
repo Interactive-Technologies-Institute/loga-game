@@ -259,6 +259,33 @@ export type Database = {
         }
         Relationships: []
       }
+      saved_stories: {
+        Row: {
+          character: Json
+          created_at: string
+          id: number
+          player_name: string
+          rounds: Json
+          story_title: string
+        }
+        Insert: {
+          character: Json
+          created_at?: string
+          id?: number
+          player_name: string
+          rounds: Json
+          story_title: string
+        }
+        Update: {
+          character?: Json
+          created_at?: string
+          id?: number
+          player_name?: string
+          rounds?: Json
+          story_title?: string
+        }
+        Relationships: []
+      }
       stops: {
         Row: {
           id: number
@@ -328,6 +355,15 @@ export type Database = {
       }
       roll_dice: {
         Args: { p_game_id: number }
+        Returns: number
+      }
+      save_story: {
+        Args: {
+          p_player_name: string
+          p_story_title: string
+          p_character: Json
+          p_rounds: Json
+        }
         Returns: number
       }
       start_game: {

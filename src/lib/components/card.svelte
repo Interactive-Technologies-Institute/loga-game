@@ -4,9 +4,10 @@
 
 	interface CardProps {
 		card: Card;
+		className?: string;
 	}
 
-	let { card }: CardProps = $props();
+	let { card, className = '' }: CardProps = $props();
 
 	const cardColors = {
 		landmark: 'border-landmark-green',
@@ -31,16 +32,16 @@
 </script>
 
 <div
-	class="w-64 h-96 bg-white rounded-xl bg-cover border {borderColor}"
+	class="w-64 h-96 bg-white rounded-xl bg-cover border {borderColor} {className}"
 	style="background-image: url('/images/cards/{card.type}.svg');"
 >
-	<div class="h-[5.5rem] w-full flex items-center justify-center">
-		<h3 class="text-lg text-primary pl-24 pr-6 leading-snug">
+	<div class="h-1/4 w-full flex items-center pl-24">
+		<h3 class=" text-light-green font-bold leading-snug text-xl">
 			{getTranslation(card.title ?? undefined)}
 		</h3>
 	</div>
-	<p class="px-6 text-balance leading-snug relative">
-		<span class="absolute m-4 inset-0 bg-white [box-shadow:0_0_15px_15px_white]"></span>
+	<p class="px-4 text-pretty leading-snug relative">
+		<span class="absolute mx-5 inset-0 bg-white [box-shadow:0_0_15px_15px_white]"></span>
 		<span class="relative z-10">{getTranslation(card.text)}</span>
 	</p>
 </div>
