@@ -29,8 +29,8 @@
 		const rotations = {
 			1: 'rotateX(0) rotateY(0)', // Front
 			6: 'rotateX(180deg) rotateY(0)', // Back
-			3: 'rotateX(0) rotateY(90deg)', // Right
-			4: 'rotateX(0) rotateY(-90deg)', // Left
+			4: 'rotateX(0) rotateY(90deg)', // Right
+			3: 'rotateX(0) rotateY(-90deg)', // Left
 			2: 'rotateX(-90deg) rotateY(0)', // Top
 			5: 'rotateX(90deg) rotateY(0)' // Bottom
 		};
@@ -38,6 +38,7 @@
 	}
 
 	let randomRotation = $state('');
+	$inspect(value, 'value');
 
 	$effect(() => {
 		if (round === 0 || round === 7) {

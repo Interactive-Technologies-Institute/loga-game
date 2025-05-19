@@ -77,6 +77,16 @@
 	<h1 class="flex items-center justify-center text-dark-green font-bold text-7xl mb-9">
 		LoGaCulture
 	</h1>
+	<div class="flex items-center justify-center mt-4">
+		<Button
+			variant="outline"
+			size="lg"
+			href={localizeUrl('/stories')}
+			class="text-dark-green hover:text-dark-green/90 mb-4 bg-white hover-bg-gray-100 transition-all duration-200 ease-in-out"
+		>
+			{m.browse_stories()}
+		</Button>
+	</div>
 	<div class="flex flex-col items-stretch justify-center gap-4">
 		<p class="flex items-center justify-center text-dark-green font-medium">
 			{m.label_join_game()}
