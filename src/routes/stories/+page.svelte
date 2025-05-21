@@ -43,7 +43,7 @@
 		{ value: 'oldest', label: m.oldest_first() }
 	];
 	let { data } = $props();
-	let stories = $state(data.stories);
+	const stories = $derived(data.stories);
 
 	let search = $state(page.url.searchParams.get('search') || '');
 	let value = $state(page.url.searchParams.get('character') || '');
@@ -70,10 +70,6 @@
 	let searchTimeout: ReturnType<typeof setTimeout>;
 
 	$effect(() => {
-		stories = data.stories;
-	});
-
-	$effect(() => {
 		if (searchTimeout) {
 			clearTimeout(searchTimeout);
 		}
@@ -93,7 +89,7 @@
 						if (currentPage) params.set('page', currentPage.toString());
 
 						await goto(`?${params.toString()}`, { replaceState: true });
-						await invalidateAll();
+
 						searchInput?.focus();
 					} finally {
 						loading = false;
@@ -103,7 +99,7 @@
 		}
 	});
 
-	function handleClearFilters() {
+	async function handleClearFilters() {
 		search = '';
 		value = '';
 		selectedCardTypes = [];
@@ -112,15 +108,16 @@
 		const url = new URL(page.url);
 		url.searchParams.delete('search');
 		url.searchParams.delete('character');
-		goto(url);
+		await goto(url);
+		searchInput?.focus();
 	}
-	$inspect(currentPage);
 </script>
 
 <div class="flex flex-col p-6 md:p-24 mx-auto">
 	<div class="flex items-start">
 		<Button class="p-0 text-lg gap-1" variant={'ghost'} href={localizeUrl('/')}
-			><ChevronLeft strokeWidth={4} size={32} absoluteStrokeWidth={true} /> {m.main_menu()}</Button
+			><ChevronLeft strokeWidth={4} size={32} absoluteStrokeWidth={true} />
+			{m.back_to_game()}</Button
 		>
 	</div>
 

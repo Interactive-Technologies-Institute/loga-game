@@ -208,9 +208,9 @@
 			</div>
 			<div class="flex flex-col shrink-1 gap-4 min-h-full">
 				<div class="flex flex-col gap-4">
-					<p>Do you want to save your story and share with other players?</p>
+					<p>{m.do_you_want_to_save()}</p>
 					<div class="flex items-center gap-2">
-						<Label.Root for="dnd" class="text-base font-medium">Save story</Label.Root>
+						<Label.Root for="dnd" class="text-base font-medium">{m.save_story()}</Label.Root>
 						<Switch.Root
 							id="save-story"
 							bind:checked={saveStory}
@@ -226,38 +226,41 @@
 				{#if saveStory}
 					<div class="flex flex-col gap-4">
 						<span class="flex w-fit text-sm text-gray-500">
-							Please fill out the form to save your story.
+							{m.save_form()}
 						</span>
 						<form class="flex flex-col min-h-full gap-4">
 							<div>
-								<label for="name" class="text-sm font-medium text-gray-700">Player name</label>
+								<label for="name" class="text-sm font-medium text-gray-700">{m.player_name()}</label
+								>
 								<input
 									required
 									bind:value={playerName}
 									type="text"
 									id="name"
 									class="mt-1 w-full border-gray-300 border-2 p-2 rounded-md focus:ring-dark-green focus:border-dark-green focus:outline-none"
-									placeholder="Enter your name"
+									placeholder={m.player_name_placeholder()}
 								/>
 							</div>
 							<div>
-								<label for="title" class="text-sm font-medium text-gray-700">Story title</label>
+								<label for="title" class="text-sm font-medium text-gray-700"
+									>{m.story_title()}</label
+								>
 								<input
 									required
 									bind:value={storyTitle}
 									type="text"
 									id="title"
 									class="mt-1 p-2 w-full border-gray-300 rounded-md border-2 focus:ring-dark-green focus:border-dark-green focus:outline-none"
-									placeholder="Enter a title for your story"
+									placeholder={m.story_title_placeholder()}
 								/>
 							</div>
 						</form>
 					</div>
 				{:else}
-					<p class="text-sm text-red-500">*Your story will be deleted.</p>
+					<p class="text-sm text-red-500">{m.your_story_wont_saved()}</p>
 				{/if}
 				<Button class="p-2 flex" size="lg" onclick={handleGameEnd}>
-					{saveStory ? 'Save story' : 'Return to main menu'}
+					{saveStory ? m.save_story() : m.return_to_menu()}
 				</Button>
 			</div>
 		</div>

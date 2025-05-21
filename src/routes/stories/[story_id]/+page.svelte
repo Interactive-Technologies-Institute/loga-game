@@ -185,7 +185,7 @@
 				<div class="flex gap-8 px-4 min-w-min">
 					<div class="flex-shrink-0">
 						<div class="group/char flex gap-4 flex-col w-fit">
-							<div class="flex items-center gap-2 justify-center">
+							<div class="flex snap-center items-center gap-2 justify-center">
 								<div class="w-8 h-8 rounded-full bg-[#FF6157] grid place-items-center">
 									<Flag class="w-4 h-4 text-white flex items-center justify-center" />
 								</div>
@@ -198,7 +198,7 @@
 					</div>
 					<div class="h-999 w-[2px] bg-gray-200 flex-shrink-0"></div>
 
-					<div class="flex-1 overflow-x-auto">
+					<div class="flex-1">
 						<div class="flex gap-8 px-4 min-w-min">
 							{#each sortedRounds as round, index (round.roundNumber)}
 								{#if round.round !== 0 && round.round !== 7}
@@ -234,17 +234,3 @@
 		<Button href={'/'}>{m.play_game()}</Button>
 	</div>
 </div>
-
-<style lang="postcss">
-	/* Hide scrollbar for Chrome, Safari and Opera */
-	.overflow-x-auto::-webkit-scrollbar {
-		display: none;
-	}
-
-	/* Hide scrollbar for IE, Edge and Firefox */
-	.overflow-x-auto {
-		-ms-overflow-style: none; /* IE and Edge */
-		scrollbar-width: none; /* Firefox */
-		scroll-behavior: smooth;
-	}
-</style>

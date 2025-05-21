@@ -11,6 +11,7 @@ export function createGameTour() {
 			cancelIcon: {
 				enabled: true
 			},
+
 			modalOverlayOpeningPadding: 16,
 			modalOverlayOpeningRadius: 32,
 
@@ -40,6 +41,11 @@ export function createGameTour() {
 			text: m.welcome_description(),
 			buttons: [
 				{
+					text: 'Skip',
+					action: tour.cancel,
+					secondary: true
+				},
+				{
 					text: m.continue(),
 					action: tour.next
 				}
@@ -55,7 +61,12 @@ export function createGameTour() {
 			},
 			buttons: [
 				{
-					text: m.next_step(),
+					text: 'Skip',
+					action: tour.cancel,
+					secondary: true
+				},
+				{
+					text: m.continue(),
 					action: tour.next
 				}
 			],
@@ -73,7 +84,12 @@ export function createGameTour() {
 			},
 			buttons: [
 				{
-					text: m.next_step(),
+					text: 'Skip',
+					action: tour.cancel,
+					secondary: true
+				},
+				{
+					text: m.continue(),
 					action: tour.next
 				}
 			],
@@ -91,7 +107,12 @@ export function createGameTour() {
 			},
 			buttons: [
 				{
-					text: m.next_step(),
+					text: 'Skip',
+					action: tour.cancel,
+					secondary: true
+				},
+				{
+					text: m.continue(),
 					action: tour.next
 				}
 			],
@@ -109,7 +130,12 @@ export function createGameTour() {
 			},
 			buttons: [
 				{
-					text: m.next_step(),
+					text: 'Skip',
+					action: tour.cancel,
+					secondary: true
+				},
+				{
+					text: m.continue(),
 					action: tour.next
 				}
 			],
@@ -127,7 +153,12 @@ export function createGameTour() {
 			},
 			buttons: [
 				{
-					text: m.next_step(),
+					text: 'Skip',
+					action: tour.cancel,
+					secondary: true
+				},
+				{
+					text: m.continue(),
 					action: tour.next
 				}
 			],
@@ -144,6 +175,11 @@ export function createGameTour() {
 				on: 'left-start'
 			},
 			buttons: [
+				{
+					text: 'Skip',
+					action: tour.cancel,
+					secondary: true
+				},
 				{
 					text: m.start_playing(),
 					action: tour.complete
