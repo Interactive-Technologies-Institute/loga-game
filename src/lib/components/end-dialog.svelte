@@ -126,7 +126,7 @@
 <Dialog.Root bind:open>
 	<Dialog.Content
 		interactOutsideBehavior="ignore"
-		class="overflow-y-auto max-h-[80vh] w-fit max-w-[90vw] flex flex-col"
+		class="overflow-y-auto max-h-[80vh] max-w-full md:max-w-4xl flex flex-col w-full"
 	>
 		<div class="flex flex-col items-center justify-center gap-1">
 			<p class="text-dark-green rounded-full font-medium text-lg underline">{m.game_ended()}</p>
@@ -134,7 +134,7 @@
 		</div>
 		<div class="flex flex-col lg:flex-row gap-4 p-4 h-full">
 			<div
-				class="overflow-y-auto flex flex-col flex-grow border-2 border-dark-green rounded-lg w-[75ch] h-full"
+				class="overflow-y-auto flex flex-col flex-grow border-2 border-dark-green rounded-lg w-full max-w-full sm:max-w-[75ch]"
 			>
 				<h2 class="text-xl font-bold text-dark-green p-2">{m.your_story()}</h2>
 

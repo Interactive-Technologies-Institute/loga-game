@@ -38,7 +38,6 @@
 	}
 
 	let randomRotation = $state('');
-	$inspect(value, 'value');
 
 	$effect(() => {
 		if (round === 0 || round === 7) {
@@ -67,9 +66,24 @@
 			currentRotation = finalRot;
 		}, 2000);
 	});
+
+	onMount(() => {
+		const updateDiceSize = () => {
+			const diceElement = document.querySelector('.dice-container') as HTMLElement;
+			if (diceElement) {
+				const size = window.innerWidth < 768 ? '32px' : '64px';
+				diceElement.style.setProperty('--dice-size', size);
+			}
+		};
+
+		updateDiceSize();
+		window.addEventListener('resize', updateDiceSize);
+
+		return () => window.removeEventListener('resize', updateDiceSize);
+	});
 </script>
 
-<div class="w-32 h-32 shadow-2xl dice-container dice" style="perspective: 1200px">
+<div class="w-24 h-24 md:w-32 md:h-32 shadow-2xl dice-container dice" style="perspective: 1200px">
 	<div
 		class="relative w-full h-full"
 		class:animate-roll={rolling}
@@ -78,105 +92,105 @@
 		<!-- Front (1) -->
 		<div
 			class="absolute w-full h-full bg-white border-2 border-slate-200 grid grid-cols-3 grid-rows-3 p-4 shadow-inner"
-			style="transform: translateZ(64px); backface-visibility: hidden;"
+			style="transform: translateZ(calc(var(--dice-size, 32px))); backface-visibility: hidden;"
 		>
 			<div class="flex justify-center items-center col-start-2 row-start-2">
-				<div class="w-4 h-4 bg-dark-green rounded-full"></div>
+				<div class="md:w-4 md:h-4 w-3 h-3 bg-dark-green rounded-full"></div>
 			</div>
 		</div>
 
 		<!-- Back (6) -->
 		<div
 			class="absolute w-full h-full bg-white border-2 border-slate-200 grid grid-cols-3 grid-rows-3 p-4 shadow-inner"
-			style="transform: rotateY(180deg) translateZ(64px); backface-visibility: hidden;"
+			style="transform: rotateY(180deg) translateZ(calc(var(--dice-size, 32px))); backface-visibility: hidden;"
 		>
 			<div class="flex justify-center items-center col-start-1 row-start-1">
-				<div class="w-4 h-4 bg-dark-green rounded-full"></div>
+				<div class="md:w-4 md:h-4 w-3 h-3 bg-dark-green rounded-full"></div>
 			</div>
 			<div class="flex justify-center items-center col-start-3 row-start-1">
-				<div class="w-4 h-4 bg-dark-green rounded-full"></div>
+				<div class="md:w-4 md:h-4 w-3 h-3 bg-dark-green rounded-full"></div>
 			</div>
 			<div class="flex justify-center items-center col-start-1 row-start-2">
-				<div class="w-4 h-4 bg-dark-green rounded-full"></div>
+				<div class="md:w-4 md:h-4 w-3 h-3 bg-dark-green rounded-full"></div>
 			</div>
 			<div class="flex justify-center items-center col-start-3 row-start-2">
-				<div class="w-4 h-4 bg-dark-green rounded-full"></div>
+				<div class="md:w-4 md:h-4 w-3 h-3 bg-dark-green rounded-full"></div>
 			</div>
 			<div class="flex justify-center items-center col-start-1 row-start-3">
-				<div class="w-4 h-4 bg-dark-green rounded-full"></div>
+				<div class="md:w-4 md:h-4 w-3 h-3 bg-dark-green rounded-full"></div>
 			</div>
 			<div class="flex justify-center items-center col-start-3 row-start-3">
-				<div class="w-4 h-4 bg-dark-green rounded-full"></div>
+				<div class="md:w-4 md:h-4 w-3 h-3 bg-dark-green rounded-full"></div>
 			</div>
 		</div>
 
 		<!-- Right (3) -->
 		<div
 			class="absolute w-full h-full bg-white border-2 border-slate-200 grid grid-cols-3 grid-rows-3 p-4 shadow-inner"
-			style="transform: rotateY(90deg) translateZ(64px); backface-visibility: hidden;"
+			style="transform: rotateY(90deg) translateZ(calc(var(--dice-size, 32px))); backface-visibility: hidden;"
 		>
 			<div class="flex justify-center items-center col-start-1 row-start-1">
-				<div class="w-4 h-4 bg-dark-green rounded-full"></div>
+				<div class="md:w-4 md:h-4 w-3 h-3 bg-dark-green rounded-full"></div>
 			</div>
 			<div class="flex justify-center items-center col-start-2 row-start-2">
-				<div class="w-4 h-4 bg-dark-green rounded-full"></div>
+				<div class="md:w-4 md:h-4 w-3 h-3 bg-dark-green rounded-full"></div>
 			</div>
 			<div class="flex justify-center items-center col-start-3 row-start-3">
-				<div class="w-4 h-4 bg-dark-green rounded-full"></div>
+				<div class="md:w-4 md:h-4 w-3 h-3 bg-dark-green rounded-full"></div>
 			</div>
 		</div>
 
 		<!-- Left (4) -->
 		<div
 			class="absolute w-full h-full bg-white border-2 border-slate-200 grid grid-cols-3 grid-rows-3 p-4 shadow-inner"
-			style="transform: rotateY(-90deg) translateZ(64px); backface-visibility: hidden;"
+			style="transform: rotateY(-90deg) translateZ(calc(var(--dice-size, 32px))); backface-visibility: hidden;"
 		>
 			<div class="flex justify-center items-center col-start-1 row-start-1">
-				<div class="w-4 h-4 bg-dark-green rounded-full"></div>
+				<div class="md:w-4 md:h-4 w-3 h-3 bg-dark-green rounded-full"></div>
 			</div>
 			<div class="flex justify-center items-center col-start-3 row-start-1">
-				<div class="w-4 h-4 bg-dark-green rounded-full"></div>
+				<div class="md:w-4 md:h-4 w-3 h-3 bg-dark-green rounded-full"></div>
 			</div>
 			<div class="flex justify-center items-center col-start-1 row-start-3">
-				<div class="w-4 h-4 bg-dark-green rounded-full"></div>
+				<div class="md:w-4 md:h-4 w-3 h-3 bg-dark-green rounded-full"></div>
 			</div>
 			<div class="flex justify-center items-center col-start-3 row-start-3">
-				<div class="w-4 h-4 bg-dark-green rounded-full"></div>
+				<div class="md:w-4 md:h-4 w-3 h-3 bg-dark-green rounded-full"></div>
 			</div>
 		</div>
 
 		<!-- Top (2) -->
 		<div
 			class="absolute w-full h-full bg-white border-2 border-slate-200 grid grid-cols-3 grid-rows-3 p-4 shadow-inner"
-			style="transform: rotateX(90deg) translateZ(64px); backface-visibility: hidden;"
+			style="transform: rotateX(90deg) translateZ(calc(var(--dice-size, 32px))); backface-visibility: hidden;"
 		>
 			<div class="flex justify-center items-center col-start-1 row-start-1">
-				<div class="w-4 h-4 bg-dark-green rounded-full"></div>
+				<div class="md:w-4 md:h-4 w-3 h-3 bg-dark-green rounded-full"></div>
 			</div>
 			<div class="flex justify-center items-center col-start-3 row-start-3">
-				<div class="w-4 h-4 bg-dark-green rounded-full"></div>
+				<div class="md:w-4 md:h-4 w-3 h-3 bg-dark-green rounded-full"></div>
 			</div>
 		</div>
 
 		<!-- Bottom (5) -->
 		<div
 			class="absolute w-full h-full bg-white border-2 border-slate-200 grid grid-cols-3 grid-rows-3 p-4 shadow-inner"
-			style="transform: rotateX(-90deg) translateZ(64px); backface-visibility: hidden;"
+			style="transform: rotateX(-90deg) translateZ(calc(var(--dice-size, 32px))); backface-visibility: hidden;"
 		>
 			<div class="flex justify-center items-center col-start-1 row-start-1">
-				<div class="w-4 h-4 bg-dark-green rounded-full"></div>
+				<div class="md:w-4 md:h-4 w-3 h-3 bg-dark-green rounded-full"></div>
 			</div>
 			<div class="flex justify-center items-center col-start-3 row-start-1">
-				<div class="w-4 h-4 bg-dark-green rounded-full"></div>
+				<div class="md:w-4 md:h-4 w-3 h-3 bg-dark-green rounded-full"></div>
 			</div>
 			<div class="flex justify-center items-center col-start-2 row-start-2">
-				<div class="w-4 h-4 bg-dark-green rounded-full"></div>
+				<div class="md:w-4 md:h-4 w-3 h-3 bg-dark-green rounded-full"></div>
 			</div>
 			<div class="flex justify-center items-center col-start-1 row-start-3">
-				<div class="w-4 h-4 bg-dark-green rounded-full"></div>
+				<div class="md:w-4 md:h-4 w-3 h-3 bg-dark-green rounded-full"></div>
 			</div>
 			<div class="flex justify-center items-center col-start-3 row-start-3">
-				<div class="w-4 h-4 bg-dark-green rounded-full"></div>
+				<div class="md:w-4 md:h-4 w-3 h-3 bg-dark-green rounded-full"></div>
 			</div>
 		</div>
 	</div>

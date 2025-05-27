@@ -73,6 +73,9 @@ export class MapPosition {
 	}
 
 	startDrag(event: MouseEvent | TouchEvent) {
+		if (event.target instanceof HTMLElement && event.target.closest('button, a, input, dialog, [role="button"]')) {
+            return; // Don't start drag on interactive elements
+        }
 		this.isDragging = true;
 		this.dragEnded = false;
 		const clientX = event instanceof MouseEvent ? event.clientX : event.touches[0].clientX;

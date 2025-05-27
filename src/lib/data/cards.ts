@@ -20,6 +20,12 @@ export const CARDS: Card[] = [
         text: 'card_nature_3_text',
     },
     {
+        id: 4,
+        type: 'nature',
+        title: 'card_nature_4_title',
+        text: 'card_nature_4_text',
+    },
+    {
         id: 5,
         type: 'nature',
         title: 'card_nature_5_title',

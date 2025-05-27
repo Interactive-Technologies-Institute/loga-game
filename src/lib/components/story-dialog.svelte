@@ -61,6 +61,7 @@
 	let playerCards = $derived.by(() => {
 		return gameState.playersCards.filter((card) => card.player_id === gameState.playerId);
 	});
+
 	let playerAnswers = $derived.by(() => {
 		return gameState.playersAnswers.filter((answer) => answer.player_id === gameState.playerId);
 	});
@@ -101,7 +102,7 @@
 <Dialog.Root bind:open>
 	<Dialog.Content
 		interactOutsideBehavior="ignore"
-		class="overflow-y-auto flex flex-col gap-y-10 max-h-[80vh] sm:max-w-[60rem]"
+		class="overflow-y-auto flex flex-col gap-y-10 max-h-[80vh] max-w-4xl w-full pb-64 md:pb-0"
 	>
 		{#each sortedRounds as round (round.index)}
 			{@const card_id = playerCards.find((card) => card.round === round.index)?.card_id}
@@ -109,7 +110,8 @@
 			{@const answer = playerAnswers.find((answer) => answer.round === round.index)}
 			<div
 				id={`round-${round.index}`}
-				class="flex flex-row items-stretch gap-x-8 {round.index > (currentRound ?? -1)
+				class="flex flex-col items-center md:flex-row md:items-stretch gap-8 w-full {round.index >
+				(currentRound ?? -1)
 					? 'opacity-30 grayscale'
 					: ''}"
 			>
@@ -169,7 +171,7 @@
 					</p>
 					{#if round.index === currentRound && playerState === 'writing'}
 						<div class="flex-1 relative mb-4">
-							<Textarea class="h-full mt-2" bind:value={currentAnswer} />
+							<Textarea class="min-h-64 h-full mt-2" bind:value={currentAnswer} />
 						</div>
 						<div class=" flex items-center justify-between gap-3 bg-white">
 							{#if open && playerState === 'writing'}
@@ -178,11 +180,11 @@
 							<Button onclick={onSubmit}>{m.submit()}</Button>
 						</div>
 					{:else}
-						<Textarea class="flex-1 mt-2" value={answer?.answer ?? ''} disabled />
+						<Textarea class="min-h-64 flex-1 mt-2" value={answer?.answer ?? ''} disabled />
 					{/if}
 				</div>
 			</div>
-			{#if round.index === 0 || round.index === 6}
+			{#if round.index !== 7}
 				<div class="h-0.5 border-t-2 border-gray-200"></div>
 			{/if}
 		{/each}
