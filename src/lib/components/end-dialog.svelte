@@ -111,7 +111,7 @@
 		audio.play();
 		if (!saveStory) {
 			console.log('Story not saved. Returning to main menu.');
-			// goto(localizeHref('/'));
+			goto(localizeHref('/'));
 		} else {
 			// Logic to save the story
 			const id = await gameState.saveStory(playerName, storyTitle);
