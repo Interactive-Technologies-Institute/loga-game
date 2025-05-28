@@ -57,9 +57,23 @@
 	});
 </script>
 
-<div class="bg-[#D8EFF4] w-full h-full overflow-hidden" bind:this={mapContainer}>
+<!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
+<div
+	class="bg-[#D8EFF4] w-full h-full overflow-hidden touch-none relative"
+	bind:this={mapContainer}
+	onwheel={position.zoom}
+	onmousedown={position.startDrag}
+	onmousemove={position.drag}
+	onmouseup={position.endDrag}
+	onmouseleave={position.endDrag}
+	ontouchstart={position.startDrag}
+	ontouchmove={position.drag}
+	ontouchend={position.endDrag}
+	role="region"
+	aria-label="Game map area"
+>
 	<div
-		class="origin-center transition-transform relative w-full h-full {position.hasMovedBeyondThreshold
+		class="origin-center transition-transform relative w-full h-full touch-pan-x touch-pan-y {position.hasMovedBeyondThreshold
 			? 'cursor-grabbing'
 			: 'cursor-grab'}"
 		style={`transform: scale(${position.scale}) translate(${position.x}px, ${position.y}px);`}

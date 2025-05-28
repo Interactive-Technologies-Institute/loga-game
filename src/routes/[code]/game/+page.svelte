@@ -108,7 +108,7 @@
 	});
 </script>
 
-<svelte:window
+<!-- <svelte:window
 	onkeydown={(e) => mapPosition.pan(e)}
 	onwheel={(e) => mapPosition.zoom(e)}
 	onmousedown={(e) => mapPosition.startDrag(e)}
@@ -118,7 +118,7 @@
 	ontouchstart={(e) => mapPosition.startDrag(e)}
 	ontouchmove={(e) => mapPosition.drag(e)}
 	ontouchend={() => mapPosition.endDrag()}
-/>
+/> -->
 
 <div class="w-screen h-screen relative">
 	<Map {gameState} position={mapPosition} />

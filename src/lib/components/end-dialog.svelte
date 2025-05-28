@@ -126,7 +126,7 @@
 <Dialog.Root bind:open>
 	<Dialog.Content
 		interactOutsideBehavior="ignore"
-		class="overflow-y-auto max-h-[80vh] max-h-[96vh] sm:max-h-[80vh] w-[calc(100vw-2rem)] lg:max-w-4xl flex flex-col"
+		class="overflow-y-auto max-h-[96vh] sm:max-h-[80vh] w-[calc(100vw-2rem)] lg:max-w-4xl flex flex-col"
 	>
 		<div class="flex flex-col items-center justify-center gap-1">
 			<p class="text-dark-green rounded-full font-medium text-lg underline">{m.game_ended()}</p>
