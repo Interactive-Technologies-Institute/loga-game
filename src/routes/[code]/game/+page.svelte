@@ -120,7 +120,7 @@
 	ontouchend={() => mapPosition.endDrag()}
 /> -->
 
-<div class="w-screen h-screen relative">
+<div class="w-screen h-[100dvh] relative">
 	<Map {gameState} position={mapPosition} />
 	<MiniMap position={mapPosition} />
 	<RoundIndicator rounds={gameState.rounds} currentRound={gameState.currentRound} />

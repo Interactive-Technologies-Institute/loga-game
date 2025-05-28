@@ -18,7 +18,7 @@ export class MapPosition {
 	containerWidth = $state(0);
 	containerHeight = $state(0);
 
-	private readonly PINCH_ZOOM_SENSITIVITY = 40;
+	private readonly PINCH_ZOOM_SENSITIVITY = 3;
 	private readonly WHEEL_ZOOM_SENSITIVITY = 0.001;
 
 	constructor() {
