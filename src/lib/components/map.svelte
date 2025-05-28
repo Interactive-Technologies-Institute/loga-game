@@ -59,7 +59,7 @@
 
 <!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
 <div
-	class="bg-[#D8EFF4] w-full h-full overflow-hidden touch-none relative"
+	class="bg-[#D8EFF4] w-full h-full overflow-hidden touch-none relative will-change-transform"
 	bind:this={mapContainer}
 	onwheel={position.zoom}
 	onmousedown={position.startDrag}
@@ -73,17 +73,16 @@
 	aria-label="Game map area"
 >
 	<div
-		class="origin-center transition-transform relative w-full h-full touch-pan-x touch-pan-y {position.hasMovedBeyondThreshold
-			? 'cursor-grabbing'
-			: 'cursor-grab'}"
+		class="origin-center relative w-full h-full touch-pan-x touch-pan-y will-change-transform"
 		style={`transform: scale(${position.scale}) translate(${position.x}px, ${position.y}px);`}
 	>
 		<div class="absolute h-[50vh] w-[70vw] inset-0 m-auto pointer-events-none map-highlight"></div>
 		<img
 			src="/images/map.svg"
 			alt="Game Map"
-			class="w-full h-full pointer-events-none"
+			class="absolute inset-0 w-full h-full pointer-events-none select-none will-change-transform"
 			draggable="false"
+			fetchpriority="high"
 		/>
 		<svg
 			viewBox="0 0 2834.65 2267.72"
@@ -148,5 +147,20 @@
 		animation: pulse-badge 2s ease-in-out infinite;
 		transform-origin: center;
 		transform-box: fill-box;
+	}
+	/* Optimize rendering performance */
+	img {
+		backface-visibility: hidden;
+		-webkit-backface-visibility: hidden;
+		-webkit-transform: translateZ(0);
+		-moz-transform: translateZ(0);
+		-ms-transform: translateZ(0);
+		-o-transform: translateZ(0);
+		transform: translateZ(0);
+	}
+
+	/* Force hardware acceleration */
+	.will-change-transform {
+		will-change: transform;
 	}
 </style>
