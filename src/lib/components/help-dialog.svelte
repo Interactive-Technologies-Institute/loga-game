@@ -12,7 +12,9 @@
 </script>
 
 <Dialog.Root bind:open>
-	<Dialog.Content class="overflow-y-auto h-full max-h-[80vh] max-w-4xl w-full">
+	<Dialog.Content
+		class="overflow-y-auto h-full max-h-[96vh] sm:max-h-[80vh] w-full max-w-[calc(100%-2rem)] lg:max-w-4xl"
+	>
 		<div class="space-y-6 p-4">
 			<h2 class="text-3xl font-black text-dark-green text-center">{m.instructions()}</h2>
 			<section class="space-y-4">

@@ -125,6 +125,7 @@
 	<MiniMap position={mapPosition} />
 	<RoundIndicator rounds={gameState.rounds} currentRound={gameState.currentRound} />
 	<Button
+		size="lg"
 		onclick={() => (openStoryDialog = true)}
 		class="absolute bottom-4 left-1/2 -translate-x-1/2 story-button rounded-full"
 	>

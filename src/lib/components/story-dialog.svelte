@@ -102,7 +102,8 @@
 <Dialog.Root bind:open>
 	<Dialog.Content
 		interactOutsideBehavior="ignore"
-		class="overflow-y-auto flex flex-col gap-y-10 max-h-[80vh] max-w-4xl w-full pb-64 md:pb-0"
+		class="overflow-y-auto flex flex-col gap-y-10 max-h-[96vh] sm:max-h-[80vh] w-[calc(100vw-2rem)] lg:max-w-4xl pb-64 md:pb-0"
+		style="transform-origin: center center;"
 	>
 		{#each sortedRounds as round (round.index)}
 			{@const card_id = playerCards.find((card) => card.round === round.index)?.card_id}

@@ -184,7 +184,7 @@
 	</div>
 	<div class="flex gap-4 items-center justify-start w-full">
 		<div class="relative w-full">
-			<div class="flex-1 overflow-x-auto snap-x snap-mandatory">
+			<div class="flex-1 overflow-x-auto md:overflow-x-scroll snap-x snap-mandatory md:snap-none">
 				<div class="flex gap-8 px-4 min-w-min">
 					<div class="flex-shrink-0">
 						<div class="group/char flex gap-4 flex-col w-fit">
