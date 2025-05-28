@@ -108,7 +108,7 @@
 	});
 </script>
 
-<svelte:window
+<!-- <svelte:window
 	onkeydown={(e) => mapPosition.pan(e)}
 	onwheel={(e) => mapPosition.zoom(e)}
 	onmousedown={(e) => mapPosition.startDrag(e)}
@@ -118,18 +118,18 @@
 	ontouchstart={(e) => mapPosition.startDrag(e)}
 	ontouchmove={(e) => mapPosition.drag(e)}
 	ontouchend={() => mapPosition.endDrag()}
-/>
+/> -->
 
-<div class="w-screen h-screen relative">
+<div class="w-screen h-[100dvh] relative">
 	<Map {gameState} position={mapPosition} />
 	<MiniMap position={mapPosition} />
 	<RoundIndicator rounds={gameState.rounds} currentRound={gameState.currentRound} />
 	<Button
-		size="icon-lg"
+		size="lg"
 		onclick={() => (openStoryDialog = true)}
-		class="absolute top-4 left-4 story-button"
+		class="absolute bottom-4 left-1/2 -translate-x-1/2 story-button rounded-full"
 	>
-		<ScrollText />
+		<ScrollText /> Story Sheet
 	</Button>
 	<StoryDialog bind:open={openStoryDialog} {gameState} />
 	<Button
@@ -141,7 +141,7 @@
 	</Button>
 	<HelpDialog bind:open={openHelpDialog} />
 	<div
-		class="absolute left-4 inset-y-0 flex flex-col items-center justify-center gap-5 pointer-events-none"
+		class="absolute left-4 top-36 flex flex-col items-center justify-center gap-5 pointer-events-none"
 	>
 		{#each Object.values(gameState.players) as player (player.id)}
 			<PlayerBadge
@@ -153,23 +153,11 @@
 			/>
 		{/each}
 	</div>
-	<div class="absolute left-8 bottom-8">
+	<div class="absolute left-4 bottom-4">
 		{#if dice}
 			<Dice value={dice} round={gameState.currentRound} />
 		{/if}
 	</div>
-
-	<p
-		class="absolute left-0 right-0 bottom-4 flex items-center justify-center text-center text-lg text-text"
-	>
-		{#if playerState === 'moving'}
-			{m.choose_your_new_stop()}
-		{:else if playerState === 'writing'}
-			{m.write_story()}
-		{:else if playerState === 'done'}
-			{m.you_are_done()}
-		{/if}
-	</p>
 
 	<EndDialog bind:open={openEndDialog} {gameState} />
 </div>

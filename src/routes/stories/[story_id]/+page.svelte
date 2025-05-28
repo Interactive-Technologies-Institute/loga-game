@@ -28,7 +28,6 @@
 
 	let { data } = $props();
 	let story = data.story;
-	$inspect(story);
 
 	let storyCharacter = story.character.type;
 
@@ -118,7 +117,11 @@
 					<span class="text-gray-500">{story.player_name} as</span>
 					<span class="font-bold text-black">{story.character.nickname}</span>
 				</p>
-				<p class="text-gray-500 text-sm">"{story.character.description}"</p>
+				{#if story.character.description !== ''}
+					<p class="text-gray-500 text-sm">"{story.character.description}"</p>
+				{:else}
+					<p class="text-gray-500 text-sm italic">No description...</p>
+				{/if}
 			</div>
 			<div>
 				<div class="flex gap-2 flex-wrap">
@@ -181,7 +184,7 @@
 	</div>
 	<div class="flex gap-4 items-center justify-start w-full">
 		<div class="relative w-full">
-			<div class="flex-1 overflow-x-auto snap-x snap-mandatory">
+			<div class="flex-1 overflow-x-auto md:overflow-x-scroll snap-x snap-mandatory md:snap-none">
 				<div class="flex gap-8 px-4 min-w-min">
 					<div class="flex-shrink-0">
 						<div class="group/char flex gap-4 flex-col w-fit">

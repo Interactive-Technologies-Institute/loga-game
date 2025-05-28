@@ -222,7 +222,7 @@
 		<div class="flex items-center justify-between">
 			<p class="text-2xl text-dark-green font-bold">{m.stories()}</p>
 			<div class="flex items-center gap-2">
-				<p class="flex items-center font-medium text-sm mr-1">{m.sort_by()}</p>
+				<p class="font-medium text-sm">{m.sort_by()}</p>
 				<Select.Root
 					type="single"
 					value={sort}
@@ -230,7 +230,7 @@
 					items={sortOptions}
 				>
 					<Select.Trigger
-						class="h-10 rounded-md border-gray-300 bg-white focus:ring-dark-green focus:border-dark-green focus:ring-1 outline-none inline-flex w-48 select-none items-center border px-3 text-sm transition-colors"
+						class="h-10 rounded-md border-gray-300 bg-white focus:ring-dark-green focus:border-dark-green focus:ring-1 outline-none inline-flex w-36 lg:w-48 select-none items-center border px-3 text-sm transition-colors"
 						aria-label="Sort stories"
 					>
 						<span>{sortOptions.find((opt) => opt.value === sort)?.label}</span>

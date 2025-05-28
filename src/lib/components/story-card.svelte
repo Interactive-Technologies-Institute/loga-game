@@ -81,13 +81,13 @@
 				</p>
 			</div>
 		</div>
-		<div class="flex flex-wrap items-center justify-between">
-			<div>
+		<div class="flex flex-col lg:flex-row justify-between gap-4">
+			<div class="flex flex-wrap items-center gap-1">
 				{#each [...new Set((Object.values(data.rounds) as StoryRound[])
 							.map((round) => round.type)
 							.filter((type): type is keyof typeof buttonColor => type !== null && type in buttonColor))] as type}
 					<span
-						class="capitalize inline-block px-4 py-2 text-xs rounded-md mr-2 mb-2 {buttonColor[
+						class="capitalize inline-block px-4 py-2 text-xs rounded-md {buttonColor[
 							type
 						]} text-white"
 					>
@@ -95,7 +95,7 @@
 					</span>
 				{/each}
 			</div>
-			<div class="flex gap-2 items-center">
+			<div class="flex gap-2 items-center self-end">
 				<Button variant={'outline'} onclick={copyToClipboard} class="transition-all duration-200">
 					{#if isCopied}
 						<Check class="w-4 h-4 mr-2" /> {m.copied()}

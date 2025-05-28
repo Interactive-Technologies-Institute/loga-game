@@ -111,7 +111,7 @@
 		audio.play();
 		if (!saveStory) {
 			console.log('Story not saved. Returning to main menu.');
-			// goto(localizeHref('/'));
+			goto(localizeHref('/'));
 		} else {
 			// Logic to save the story
 			const id = await gameState.saveStory(playerName, storyTitle);
@@ -126,7 +126,7 @@
 <Dialog.Root bind:open>
 	<Dialog.Content
 		interactOutsideBehavior="ignore"
-		class="overflow-y-auto max-h-[80vh] w-fit max-w-[90vw] flex flex-col"
+		class="overflow-y-auto max-h-[96vh] sm:max-h-[80vh] w-[calc(100vw-2rem)] lg:max-w-4xl flex flex-col"
 	>
 		<div class="flex flex-col items-center justify-center gap-1">
 			<p class="text-dark-green rounded-full font-medium text-lg underline">{m.game_ended()}</p>
@@ -134,7 +134,7 @@
 		</div>
 		<div class="flex flex-col lg:flex-row gap-4 p-4 h-full">
 			<div
-				class="overflow-y-auto flex flex-col flex-grow border-2 border-dark-green rounded-lg w-[75ch] h-full"
+				class="overflow-y-auto flex flex-col flex-grow border-2 border-dark-green rounded-lg w-full max-w-full sm:max-w-[75ch]"
 			>
 				<h2 class="text-xl font-bold text-dark-green p-2">{m.your_story()}</h2>
 

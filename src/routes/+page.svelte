@@ -74,7 +74,7 @@
 </script>
 
 <div class="h-screen flex flex-col items-center justify-center bg-white">
-	<h1 class="flex items-center justify-center text-dark-green font-bold text-7xl mb-9">
+	<h1 class="flex items-center justify-center text-dark-green font-bold text-5xl md:text-7xl mb-9">
 		LoGaCulture
 	</h1>
 	<div class="flex items-center justify-center mt-4">

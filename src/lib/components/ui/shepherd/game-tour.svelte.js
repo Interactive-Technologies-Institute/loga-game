@@ -103,7 +103,7 @@ export function createGameTour() {
 			text: m.story_sheet_description(),
 			attachTo: {
 				element: '.story-button',
-				on: 'right-end'
+				on: 'top'
 			},
 			buttons: [
 				{
@@ -126,7 +126,7 @@ export function createGameTour() {
 			text: m.player_badge_description(),
 			attachTo: {
 				element: '.player-badges',
-				on: 'right'
+				on: 'bottom'
 			},
 			buttons: [
 				{
@@ -149,7 +149,7 @@ export function createGameTour() {
 			text: m.dice_description(),
 			attachTo: {
 				element: '.dice',
-				on: 'right-end'
+				on: 'top'
 			},
 			buttons: [
 				{
@@ -172,7 +172,7 @@ export function createGameTour() {
 			text: m.instructions_description(),
 			attachTo: {
 				element: '.help-button',
-				on: 'left-start'
+				on: 'bottom'
 			},
 			buttons: [
 				{

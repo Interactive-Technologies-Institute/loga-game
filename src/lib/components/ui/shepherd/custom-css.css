@@ -4,7 +4,7 @@
 
 /* Main container */
 .shepherd-element {
-	@apply !max-w-[45vw];
+	@apply !max-w-2xl;
 	@apply !max-h-[90vh];
 	@apply !shadow-2xl;
 }
@@ -16,17 +16,17 @@
 
 /* Header */
 .shepherd-element .shepherd-header {
-	@apply !bg-white;
+    @apply !bg-white !flex !items-start !justify-between !gap-2;
 }
 
 /* Title */
 .shepherd-element .shepherd-title {
-	@apply text-2xl font-bold text-dark-green;
+    @apply text-2xl font-bold text-dark-green !break-words !whitespace-normal !max-w-[calc(100%-2rem)];;
 }
 
 /* Close button */
 .shepherd-element .shepherd-cancel-icon {
-	@apply !text-dark-green hover:!text-dark-green/60 transition-colors;
+    @apply !text-dark-green hover:!text-dark-green/60 transition-colors !flex-shrink-0;
 }
 
 /* Main text content */

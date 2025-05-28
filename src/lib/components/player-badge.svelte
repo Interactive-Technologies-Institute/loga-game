@@ -13,7 +13,7 @@
 	}
 
 	let { player, playerState, rounds, currentRound, tourCompleted }: PlayerBadgeProps = $props();
-	let isVisible = $state(false);
+	let isVisible = $state(true);
 	let isExiting = $state(false);
 	let previousState = $state(playerState.state);
 	let exitTimeout: ReturnType<typeof setTimeout> | undefined = $state(undefined);
@@ -100,14 +100,14 @@
 <div class="rounded-full w-16 h-16 relative player-badges">
 	{#if isVisible}
 		<div
-			class="absolute bg-white flex flex-col items-start justify-center w-max h-16 pl-12 pr-6 rounded-br-full rounded-tr-full left-1/2 z-10 {isExiting
+			class="absolute bg-white flex flex-col items-start justify-center w-max h-16 pl-10 lg:pl-12 pr-4 lg:pr-6 rounded-br-full rounded-tr-full left-1/2 z-10 {isExiting
 				? 'slide-out'
 				: 'slide-in'}"
 		>
-			<h3 class="text-dark-green font-bold text-sm {isExiting ? 'fade-out' : 'fade-in'}">
+			<h3 class="text-dark-green font-bold text-xs sm:text-sm {isExiting ? 'fade-out' : 'fade-in'}">
 				{getMessage().title}
 			</h3>
-			<p class="text-xl {isExiting ? 'fade-out-delayed' : 'fade-in-delayed'}">
+			<p class="text-sm sm:text-lg {isExiting ? 'fade-out-delayed' : 'fade-in-delayed'}">
 				{getMessage().subtitle}
 			</p>
 		</div>

@@ -60,8 +60,8 @@
 
 	{#if selectionStep === 'category'}
 		<h2 class="text-dark-green text-xl font-bold my-6">{m.select_type()}</h2>
-		<div class="flex flex-col items-center justify-center w-[640px]">
-			<div class="grid grid-cols-2 gap-8 mb-10">
+		<div class="flex flex-col items-center justify-center p-4 min-w-xs max-w-2xl">
+			<div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-10">
 				<!-- Human Category -->
 
 				<button
@@ -113,7 +113,7 @@
 		</div>
 	{:else if selectionStep === 'character'}
 		<p class="text-dark-green text-lg font-bold my-2">{m.select_character()}</p>
-		<div class="grid grid-cols-3 gap-6 mb-10">
+		<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
 			{#each CHARACTER_CATEGORIES[selectedCategory ?? 'human'] as character}
 				{@const player = gameState.players.find((player) => player.character === character)}
 				{@const isReady = currentPlayer.nickname !== null}
