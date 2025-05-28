@@ -123,10 +123,10 @@
 				{:else if round.index === 7}
 					<div class="shrink-0">
 						<div
-							class="w-64 h-96 bg-white rounded-xl bg-cover bg-center border-2 border-gray-400/50 relative"
+							class="w-64 h-96 bg-white rounded-xl bg-center border-2 border-gray-400/50 relative"
 							style="background-image: url('/images/cards/post-story.svg');"
 						>
-							<div class="absolute inset-0 mb-28 px-4 flex flex-col justify-end text-center gap-3">
+							<div class="absolute inset-0 pb-32 px-4 flex flex-col justify-end text-center gap-3">
 								<h3 class={`text-2xl font-bold text-white`}>{m.post_story()}</h3>
 								<p class="text-xs font-medium">{m.write_post_story()}</p>
 							</div>
