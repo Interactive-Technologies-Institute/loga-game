@@ -105,7 +105,7 @@
 								: 0
 					)}
 				{#each playersHere as [_, player], i}
-					{@const xPos = stop.x - 24 + i * 20 + (selectable ? 15 : 0)}
+					{@const xPos = stop.x - 24 + i * 20 + (selectable ? 42 : 0)}
 					{@const yPos = stop.y - 24}
 					{@const isCurrentPlayer = player.id === gameState.playerId}
 

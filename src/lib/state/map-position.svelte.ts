@@ -94,38 +94,43 @@ export class MapPosition {
 	}
 
 	startDrag = (event: MouseEvent | TouchEvent) => {
-		if (!(event.currentTarget instanceof HTMLElement)) return;
-		if (
-			event.target instanceof HTMLElement &&
-			event.target.closest('button, a, input, dialog, [role="button"]')
-		) {
-			return;
-		}
+        if (!(event.currentTarget instanceof HTMLElement)) return;
+        if (
+            event.target instanceof HTMLElement &&
+            event.target.closest('button, a, input, dialog, [role="button"]')
+        ) {
+            return;
+        }
 
-		if (event instanceof TouchEvent && event.touches.length === 2) {
-			// Handle pinch gesture
-			const touch1 = event.touches[0];
-			const touch2 = event.touches[1];
-			this.initialPinchDistance = Math.hypot(
-				touch1.clientX - touch2.clientX,
-				touch1.clientY - touch2.clientY
-			);
-			return;
-		}
-		this.isDragging = true;
-		this.dragEnded = false;
-		const clientX = event instanceof MouseEvent ? event.clientX : event.touches[0].clientX;
-		const clientY = event instanceof MouseEvent ? event.clientY : event.touches[0].clientY;
+        if (event instanceof TouchEvent && event.touches.length === 2) {
+            // Handle pinch gesture
+            const touch1 = event.touches[0];
+            const touch2 = event.touches[1];
+            this.initialPinchDistance = Math.hypot(
+                touch1.clientX - touch2.clientX,
+                touch1.clientY - touch2.clientY
+            );
+            return;
+        }
 
-		this.isDragging = true;
-		this.lastX = clientX;
-		this.lastY = clientY;
-		this.dragStartX = clientX;
-		this.dragStartY = clientY;
-		this.hasMovedBeyondThreshold = false;
-	};
+        this.isDragging = true;
+        this.dragEnded = false;
+        const clientX = event instanceof MouseEvent ? event.clientX : event.touches[0].clientX;
+        const clientY = event instanceof MouseEvent ? event.clientY : event.touches[0].clientY;
+
+        this.lastX = clientX;
+        this.lastY = clientY;
+        this.dragStartX = clientX;
+        this.dragStartY = clientY;
+        this.hasMovedBeyondThreshold = false;
+    };
 
 	drag = (event: MouseEvent | TouchEvent) => {
+        // Add check for left mouse button
+        if (event instanceof MouseEvent && event.buttons !== 1) {
+            this.endDrag();
+            return;
+        }
 		if (!this.isDragging || !(event.currentTarget instanceof HTMLElement)) return;
 
 		if (event instanceof TouchEvent && event.touches.length === 2) {
@@ -169,12 +174,14 @@ export class MapPosition {
 		this.lastY = clientY;
 	};
 
-	endDrag() {
-		this.isDragging = false;
-		this.hasMovedBeyondThreshold = false;
-		this.dragEnded = true;
-		setTimeout(() => {
-			this.dragEnded = false;
-		}, 0);
-	}
+	endDrag = () => {
+        if (!this.isDragging) return;
+        
+        this.isDragging = false;
+        this.hasMovedBeyondThreshold = false;
+        this.dragEnded = true;
+        setTimeout(() => {
+            this.dragEnded = false;
+        }, 0);
+    };
 }

@@ -17,7 +17,6 @@
 	let isExiting = $state(false);
 	let previousState = $state(playerState.state);
 	let exitTimeout: ReturnType<typeof setTimeout> | undefined = $state(undefined);
-	let needsNewAnimation = $state(false);
 
 	function clearExistingTimeout() {
 		if (exitTimeout) {
