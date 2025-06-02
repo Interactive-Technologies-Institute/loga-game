@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { Player, PlayerState, Round } from '@/types';
+	import type { Player, PlayerState } from '@/types';
 	import { onMount } from 'svelte';
 	import { Check, Flag, Route, SquarePen } from 'lucide-svelte';
 	import { m } from '@src/paraglide/messages';
@@ -7,12 +7,20 @@
 	interface PlayerBadgeProps {
 		player: Player;
 		playerState: PlayerState;
-		rounds: Round[];
+		round: number;
 		currentRound: number;
 		tourCompleted: boolean;
+		transitionState: 'starting' | 'transitioning' | 'ending' | 'ended';
 	}
 
-	let { player, playerState, rounds, currentRound, tourCompleted }: PlayerBadgeProps = $props();
+	let {
+		player,
+		playerState,
+		round,
+		currentRound,
+		tourCompleted,
+		transitionState
+	}: PlayerBadgeProps = $props();
 	let isVisible = $state(true);
 	let isExiting = $state(false);
 	let previousState = $state(playerState.state);
@@ -26,19 +34,23 @@
 	}
 
 	$effect(() => {
-		if (tourCompleted && previousState !== playerState.state) {
-			clearExistingTimeout();
-			if (isVisible) {
-				startExit();
-			} else {
-				// If not visible, start new animation immediately
-				startNewAnimation();
+		if (transitionState === 'ended') {
+			if (tourCompleted && previousState !== playerState.state) {
+				clearExistingTimeout();
+				if (isVisible) {
+					startExit();
+				} else {
+					// If not visible, start new animation immediately
+					startNewAnimation();
+				}
 			}
 		}
 	});
 
 	$effect(() => {
-		if (tourCompleted) {
+		if (tourCompleted === false) {
+			isVisible = false;
+		} else if (tourCompleted === true) {
 			startNewAnimation();
 		}
 	});
@@ -51,7 +63,7 @@
 		exitTimeout = setTimeout(() => {
 			startExit();
 			clearExistingTimeout();
-		}, 5000);
+		}, 6000);
 	}
 
 	function startExit() {
@@ -96,19 +108,29 @@
 	}
 </script>
 
-<div class="rounded-full w-16 h-16 relative player-badges">
+<div class="rounded-full w-12 h-12 sm:h-16 sm:w-16 relative player-badges">
 	{#if isVisible}
 		<div
-			class="absolute bg-white flex flex-col items-start justify-center w-max h-16 pl-10 lg:pl-12 pr-4 lg:pr-6 rounded-br-full rounded-tr-full left-1/2 z-10 {isExiting
+			class="absolute bg-white flex flex-col items-start justify-center w-max h-12 sm:h-16 pl-10 lg:pl-12 pr-4 lg:pr-6 rounded-br-full rounded-tr-full left-1/2 z-10 {isExiting
 				? 'slide-out'
 				: 'slide-in'}"
 		>
-			<h3 class="text-dark-green font-bold text-xs sm:text-sm {isExiting ? 'fade-out' : 'fade-in'}">
-				{getMessage().title}
-			</h3>
-			<p class="text-sm sm:text-lg {isExiting ? 'fade-out-delayed' : 'fade-in-delayed'}">
-				{getMessage().subtitle}
-			</p>
+			<div class="overflow-hidden max-w-xs">
+				<h3
+					class="text-dark-green font-bold text-xs sm:text-sm whitespace-nowrap overflow-ellipsis overflow-hidden {isExiting
+						? 'fade-out'
+						: 'fade-in'}"
+				>
+					{getMessage().title}
+				</h3>
+				<p
+					class="text-sm sm:text-lg whitespace-nowrap overflow-ellipsis overflow-hidden {isExiting
+						? 'fade-out-delayed'
+						: 'fade-in-delayed'}"
+				>
+					{getMessage().subtitle}
+				</p>
+			</div>
 		</div>
 	{/if}
 	<img
