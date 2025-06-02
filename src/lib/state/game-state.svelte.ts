@@ -38,6 +38,16 @@ export class GameState {
 		}, {});
 	});
 
+	private getGameId(): number {
+    // Find a player's game_id (they all share the same game_id)
+    const gameId = this.players?.[0]?.game_id;
+    if (!gameId) {
+        console.error('Could not find game ID for filtering subscriptions');
+        return -1; // Return a value that won't match any real game ID
+    }
+    return gameId;
+}
+
 	constructor(
 		stops: Stop[],
 		cards: Card[],
@@ -78,7 +88,8 @@ export class GameState {
 				{
 					event: 'UPDATE',
 					schema: 'public',
-					table: 'games'
+					table: 'games',
+					filter: `code=eq.${this.code}`
 				},
 				(payload) => {
 					const game = payload.new as Game;
@@ -102,7 +113,8 @@ export class GameState {
 				{
 					event: 'INSERT',
 					schema: 'public',
-					table: 'game_rounds'
+					table: 'game_rounds',
+                	filter: `game_id=eq.${this.getGameId()}`
 				},
 				(payload) => {
 					const gameRound = payload.new as GameRound;
@@ -120,7 +132,8 @@ export class GameState {
 				{
 					event: 'UPDATE',
 					schema: 'public',
-					table: 'players'
+					table: 'players',
+                	filter: `game_id=eq.${this.getGameId()}`
 				},
 				(payload) => {
 					const player = payload.new as Player;
@@ -142,7 +155,8 @@ export class GameState {
 				{
 					event: 'INSERT',
 					schema: 'public',
-					table: 'player_moves'
+					table: 'player_moves',
+                	filter: `game_id=eq.${this.getGameId()}`
 				},
 				(payload) => {
 					this.playersMoves.push(payload.new as PlayerMove);
@@ -159,7 +173,8 @@ export class GameState {
 				{
 					event: 'INSERT',
 					schema: 'public',
-					table: 'player_cards'
+					table: 'player_cards',
+                	filter: `game_id=eq.${this.getGameId()}`
 				},
 				(payload) => {
 					this.playersCards.push(payload.new as PlayerCard);
@@ -176,7 +191,8 @@ export class GameState {
 				{
 					event: 'INSERT',
 					schema: 'public',
-					table: 'player_answers'
+					table: 'player_answers',
+                	filter: `game_id=eq.${this.getGameId()}`
 				},
 				(payload) => {
 					this.playersAnswers.push(payload.new as PlayerAnswer);

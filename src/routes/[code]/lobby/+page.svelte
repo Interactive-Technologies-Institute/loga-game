@@ -2,7 +2,6 @@
 	import CharacterOption from '@/components/character-option.svelte';
 	import Button from '@/components/ui/button/button.svelte';
 	import { GameLobbyState } from '@/state/game-lobby-state.svelte';
-	import { CHARACTER_OPTIONS } from '@/types';
 	import { CHARACTER_CATEGORIES, getCharacterCategory, type CharacterCategory } from '@/types';
 	import type { PageData } from './$types';
 	import { m } from '@src/paraglide/messages.js';
@@ -52,7 +51,7 @@
 	}
 </script>
 
-<div class="h-[100dvh] flex flex-col items-center justify-center bg-white">
+<div class="h-full flex flex-col items-center justify-center bg-white">
 	<div class="bg-dark-green px-5 py-2 flex flex-col items-center justify-center rounded-lg mt-5">
 		<p class="text-white text-sm font-medium">{m.label_join_code()}</p>
 		<p class="text-white text-4xl font-bold">{data.game.code}</p>
@@ -137,8 +136,8 @@
 			{m.players_ready()}
 		{/if}
 	</p>
-	<div class="flex items-center justify-center gap-3 mb-5">
-		{#if selectionStep === 'character'}
+	{#if selectionStep === 'character'}
+		<div class="flex items-center justify-center gap-3 mb-5">
 			<Button
 				variant={'outline'}
 				size="lg"
@@ -158,6 +157,6 @@
 					{m.start_game()}
 				</Button>
 			{/if}
-		{/if}
-	</div>
+		</div>
+	{/if}
 </div>

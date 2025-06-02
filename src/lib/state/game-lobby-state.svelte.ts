@@ -9,6 +9,16 @@ export class GameLobbyState {
 	players: Player[] = $state([]);
 	playerId: PlayerId = $state(0);
 
+	private getGameId(): number {
+    // Find a player's game_id (they all share the same game_id)
+    const gameId = this.players?.[0]?.game_id;
+    if (!gameId) {
+        console.error('Could not find game ID for filtering subscriptions');
+        return -1; // Return a value that won't match any real game ID
+    }
+    return gameId;
+}
+
 	constructor(game: Game, players: Player[], playerId: PlayerId) {
 		this.code = game.code;
 		this.state = game.state as GameLobbyStateEnum;
@@ -27,7 +37,8 @@ export class GameLobbyState {
 				{
 					event: '*',
 					schema: 'public',
-					table: 'games'
+					table: 'games',
+                	filter: `code=eq.${this.code}`
 				},
 				(payload) => {
 					const game = payload.new as Game;
@@ -51,7 +62,8 @@ export class GameLobbyState {
 				{
 					event: '*',
 					schema: 'public',
-					table: 'players'
+					table: 'players',
+                	filter: `game_id=eq.${this.getGameId()}`
 				},
 				(payload) => {
 					const player = payload.new as Player;

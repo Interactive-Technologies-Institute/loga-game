@@ -106,6 +106,9 @@
 	let saveStory = $state(true);
 	let playerName = $state('');
 	let storyTitle = $state('');
+	let isFormValid = $derived(
+		saveStory ? playerName.trim() !== '' && storyTitle.trim() !== '' : true
+	);
 
 	async function handleGameEnd() {
 		audio.play();
@@ -259,7 +262,12 @@
 				{:else}
 					<p class="text-sm text-red-500">{m.your_story_wont_saved()}</p>
 				{/if}
-				<Button class="p-2 flex" size="lg" onclick={handleGameEnd}>
+				<Button
+					class="p-2 flex"
+					size="lg"
+					onclick={handleGameEnd}
+					disabled={saveStory && !isFormValid}
+				>
 					{saveStory ? m.save_story() : m.return_to_menu()}
 				</Button>
 			</div>
