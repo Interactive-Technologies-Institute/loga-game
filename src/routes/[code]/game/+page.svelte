@@ -18,7 +18,6 @@
 	import { onMount, onDestroy } from 'svelte';
 	import { createGameTour } from '@/components/ui/shepherd/game-tour.svelte.js';
 	import type { Tour } from 'shepherd.js';
-	import RoundTransition from '@/components/round-transition.svelte';
 
 	let tour: Tour | undefined;
 
@@ -73,29 +72,6 @@
 		data.playerCards,
 		data.playerAnswers
 	);
-
-	let showRoundTransition = $state(false);
-
-	type TransitionState = 'starting' | 'transitioning' | 'ending' | 'ended';
-	let transitionState: TransitionState = $state('starting');
-	let previousRound = $state(0);
-
-	$effect(() => {
-		if (
-			gameState.currentRound !== previousRound &&
-			gameState.currentRound > 0 &&
-			gameState.currentRound < 7
-		) {
-			showRoundTransition = true;
-			transitionState = 'starting';
-			previousRound = gameState.currentRound;
-		}
-	});
-
-	function handleTransitionComplete() {
-		showRoundTransition = false;
-	}
-
 	let mapPosition = new MapPosition();
 
 	let dice = $derived.by(() => {
@@ -151,10 +127,9 @@
 	<Button
 		size="lg"
 		onclick={() => (openStoryDialog = true)}
-		class="absolute bottom-4 left-1/2 -translate-x-1/2 story-button rounded-full px-4"
+		class="absolute bottom-4 left-1/2 -translate-x-1/2 story-button rounded-full"
 	>
-		<ScrollText />
-		{m.story_sheet()}
+		<ScrollText /> Story Sheet
 	</Button>
 	<StoryDialog bind:open={openStoryDialog} {gameState} />
 	<Button
@@ -173,25 +148,16 @@
 				{tourCompleted}
 				{player}
 				playerState={gameState.playersState[player.id]}
-				round={gameState.currentRound}
+				rounds={gameState.rounds}
 				currentRound={gameState.currentRound}
-				{transitionState}
 			/>
 		{/each}
 	</div>
 	<div class="absolute left-4 bottom-4">
 		{#if dice}
-			<Dice value={dice} round={gameState.currentRound} {transitionState} />
+			<Dice value={dice} round={gameState.currentRound} />
 		{/if}
 	</div>
-
-	{#if showRoundTransition}
-		<RoundTransition
-			round={gameState.currentRound}
-			onComplete={handleTransitionComplete}
-			bind:transitionState
-		/>
-	{/if}
 
 	<EndDialog bind:open={openEndDialog} {gameState} />
 </div>

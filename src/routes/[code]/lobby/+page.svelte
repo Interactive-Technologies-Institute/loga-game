@@ -52,7 +52,7 @@
 	}
 </script>
 
-<div class="h-full flex flex-col items-center justify-center bg-white">
+<div class="h-[100dvh] flex flex-col items-center justify-center bg-white">
 	<div class="bg-dark-green px-5 py-2 flex flex-col items-center justify-center rounded-lg mt-5">
 		<p class="text-white text-sm font-medium">{m.label_join_code()}</p>
 		<p class="text-white text-4xl font-bold">{data.game.code}</p>
@@ -137,8 +137,8 @@
 			{m.players_ready()}
 		{/if}
 	</p>
-	{#if selectionStep === 'character'}
-		<div class="flex items-center justify-center gap-3 mb-5">
+	<div class="flex items-center justify-center gap-3 mb-5">
+		{#if selectionStep === 'character'}
 			<Button
 				variant={'outline'}
 				size="lg"
@@ -158,6 +158,6 @@
 					{m.start_game()}
 				</Button>
 			{/if}
-		</div>
-	{/if}
+		{/if}
+	</div>
 </div>

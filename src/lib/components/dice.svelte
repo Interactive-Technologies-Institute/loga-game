@@ -1,22 +1,17 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import rollSound from '@/sounds/dice_roll.mp3';
-	import { previous } from '@src/paraglide/messages';
 
 	interface DiceProps {
 		round: number;
 		value: number;
-		transitionState: 'starting' | 'transitioning' | 'ending' | 'ended';
 	}
 
-	let { value, round, transitionState }: DiceProps = $props();
+	let { value, round }: DiceProps = $props();
 	let rolling = $state(false);
 	let audio: HTMLAudioElement;
 	let audioLoaded = $state(false);
 	let currentRotation = $state('transform: rotateX(0) rotateY(0)');
-	let previousRound = $state(0);
-
-	$inspect(transitionState, 'transitionState');
 
 	// Audio setup
 	onMount(async () => {
@@ -42,35 +37,34 @@
 		return rotations[value as keyof typeof rotations] || rotations[1];
 	}
 
+	let randomRotation = $state('');
+
 	$effect(() => {
-		if (transitionState === 'ended' && round === previousRound) {
-			if (round === 0 || round === 7) {
-				currentRotation = getFinalRotation(value);
-				return;
-			}
-
-			if (!audioLoaded) return;
-
-			rolling = true;
-			const finalRot = getFinalRotation(value);
-
-			// Set CSS custom properties for the animations
-			const diceElement = document.querySelector('.dice-container') as HTMLElement;
-			if (diceElement) {
-				diceElement.style.setProperty('--to-rotation', finalRot);
-			}
-
-			if (audio) {
-				audio.currentTime = 0;
-				audio.play().catch((err) => console.error('Error playing sound:', err));
-			}
-
-			setTimeout(() => {
-				rolling = false;
-				currentRotation = finalRot;
-			}, 2000);
+		if (round === 0 || round === 7) {
+			currentRotation = getFinalRotation(value);
+			return;
 		}
-		previousRound = round;
+
+		if (!audioLoaded) return;
+
+		rolling = true;
+		const finalRot = getFinalRotation(value);
+
+		// Set CSS custom properties for the animations
+		const diceElement = document.querySelector('.dice-container') as HTMLElement;
+		if (diceElement) {
+			diceElement.style.setProperty('--to-rotation', finalRot);
+		}
+
+		if (audio) {
+			audio.currentTime = 0;
+			audio.play().catch((err) => console.error('Error playing sound:', err));
+		}
+
+		setTimeout(() => {
+			rolling = false;
+			currentRotation = finalRot;
+		}, 2000);
 	});
 
 	onMount(() => {
