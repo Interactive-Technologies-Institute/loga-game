@@ -17,7 +17,12 @@
 
 	let { stop, selectable, onSelect }: StopProps = $props();
 
-	function handleInteraction() {
+	function handleInteraction(event: Event) {
+		// Prevent default behavior for touch events
+		if (event instanceof TouchEvent) {
+			event.preventDefault();
+		}
+
 		onSelect(stop.id);
 		if (audio) {
 			audio.currentTime = 0;
@@ -28,7 +33,7 @@
 	function handleKeyDown(event: KeyboardEvent) {
 		if (event.key === 'Enter' || event.key === ' ') {
 			event.preventDefault();
-			handleInteraction();
+			handleInteraction(event);
 		}
 	}
 </script>
@@ -45,7 +50,7 @@
 		onkeydown={handleKeyDown}
 		cx={stop.x}
 		cy={stop.y}
-		r="24"
+		r="30"
 		class="fill-transparent cursor-pointer"
 	/>
 {/if}

@@ -17,7 +17,11 @@ export class MapPosition {
 	hasMovedBeyondThreshold = $state(false);
 	containerWidth = $state(0);
 	containerHeight = $state(0);
+	isTap = $state(false);
+    touchStartTime = $state(0);
 
+    private readonly TAP_THRESHOLD = 10; // pixels
+    private readonly TAP_DURATION = 300; // ms
 	private readonly PINCH_ZOOM_SENSITIVITY = 3;
 	private readonly WHEEL_ZOOM_SENSITIVITY = 0.001;
 
@@ -113,6 +117,9 @@ export class MapPosition {
             return;
         }
 
+		this.touchStartTime = Date.now();
+        this.isTap = true;
+
         this.isDragging = true;
         this.dragEnded = false;
         const clientX = event instanceof MouseEvent ? event.clientX : event.touches[0].clientX;
@@ -148,6 +155,7 @@ export class MapPosition {
 
 			this.handlePinchZoom(scale);
 			this.initialPinchDistance = currentDistance;
+			this.isTap = false;
 			return;
 		}
 		if (!this.isDragging) return;
@@ -162,6 +170,7 @@ export class MapPosition {
 
 		if (distanceFromStart > this.dragThreshold) {
 			this.hasMovedBeyondThreshold = true;
+			this.isTap = false;
 		}
 
 		if (this.hasMovedBeyondThreshold) {
@@ -175,13 +184,29 @@ export class MapPosition {
 	};
 
 	endDrag = () => {
-        if (!this.isDragging) return;
+        // Check if this was a tap (quick touch without much movement)
+        const wasTap = this.isTap && 
+                      (Date.now() - this.touchStartTime) < this.TAP_DURATION && 
+                      !this.hasMovedBeyondThreshold;
         
-        this.isDragging = false;
-        this.hasMovedBeyondThreshold = false;
-        this.dragEnded = true;
-        setTimeout(() => {
+        // For actual taps, we want to allow clicks on stops
+        if (wasTap) {
+            // Don't disable pointer events immediately for taps
+            this.isDragging = false;
             this.dragEnded = false;
-        }, 0);
+        } else {
+            // For drags, we follow the regular pattern
+            this.isDragging = false;
+            this.hasMovedBeyondThreshold = false;
+            this.dragEnded = true;
+            
+            // Reset after a short delay to allow pointer events again
+            setTimeout(() => {
+                this.dragEnded = false;
+            }, 100);
+        }
+        
+        // Reset tap detection
+        this.isTap = false;
     };
 }

@@ -87,9 +87,7 @@
 		<svg
 			viewBox="0 0 2834.65 2267.72"
 			class="absolute inset-0 w-full h-full"
-			style="pointer-events: {position.hasMovedBeyondThreshold || position.dragEnded
-				? 'none'
-				: 'auto'}"
+			style="pointer-events: {position.hasMovedBeyondThreshold ? 'none' : 'auto'}"
 		>
 			{#each gameState.stops as stop (stop.id)}
 				{@const selectable = selectableStops.includes(stop.id)}
