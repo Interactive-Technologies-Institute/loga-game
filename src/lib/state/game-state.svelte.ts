@@ -38,6 +38,8 @@ export class GameState {
 		}, {});
 	});
 
+    roundTimerDuration: number = $state(0);
+
 	private getGameId(): number {
     // Find a player's game_id (they all share the same game_id)
     const gameId = this.players?.[0]?.game_id;
@@ -72,12 +74,30 @@ export class GameState {
 		this.playersCards = playerCards;
 		this.playersAnswers = playerAnswers;
 
+		this.initializeTimerState();
+
+
 		this.subscribeGame();
 		this.subscribeGameRounds();
 		this.subscribePlayers();
 		this.subscribePlayerMoves();
 		this.subscribePlayerCards();
 		this.subscribePlayerAnswers();
+		this.subscribeGameRounds();
+		this.subscribeRoundTimer();
+	}
+
+	// Add this method to initialize timer state
+	private initializeTimerState() {
+		// Find the current round
+		const currentRound = this.gameRounds.find(r => r.round === this.currentRound);
+		
+		// If the current round has timer data, initialize the timer state
+		if (currentRound && currentRound.timer_duration) {
+			this.roundTimerDuration = currentRound.timer_duration;
+		} else {
+			this.roundTimerDuration = 0;
+		}
 	}
 
 	async subscribeGame() {
@@ -189,13 +209,24 @@ export class GameState {
 			.on(
 				'postgres_changes',
 				{
-					event: 'INSERT',
+					event: '*',
 					schema: 'public',
 					table: 'player_answers',
                 	filter: `game_id=eq.${this.getGameId()}`
 				},
 				(payload) => {
-					this.playersAnswers.push(payload.new as PlayerAnswer);
+					// Check if this is an INSERT event
+					if (payload.eventType === 'INSERT') {
+						this.playersAnswers.push(payload.new as PlayerAnswer);
+					} 
+					// Check if this is an UPDATE event
+					else if (payload.eventType === 'UPDATE') {
+						// Update the existing answer instead of adding a new one
+						const updatedAnswer = payload.new as PlayerAnswer;
+						this.playersAnswers = this.playersAnswers.map(answer => 
+							answer.id === updatedAnswer.id ? updatedAnswer : answer
+						);
+					}
 				}
 			)
 			.subscribe();
@@ -291,7 +322,8 @@ export class GameState {
 				round: i,
 				card_id: card?.card_id || null,
 				type: cardDetails?.type || null,
-				answer: answer?.answer || ''
+				answer: answer?.answer || '',
+				public_story: true
 			};
 		}).reduce<Record<number, { card_id: number | null; type: string | null; answer: string }>>(
 			(acc, round, index) => {
@@ -369,5 +401,82 @@ export class GameState {
 		}
 
 		return Array.from(reachableStops);
+	}
+
+	async startRoundTimer() {
+		// Generate random timer between 2-4 minutes
+		const durationMinutes = Math.floor(Math.random() * 3) + 2;
+		const durationSeconds = durationMinutes * 60;
+		
+		const currentGameRound = this.gameRounds.find(r => r.round === this.currentRound);
+		if (!currentGameRound) {
+			console.error('Cannot find current game round to start timer');
+			return false;
+		}
+		
+		this.roundTimerDuration = durationSeconds;
+		
+		const { error } = await supabase
+			.from('game_rounds')
+			.update({timer_duration: durationSeconds })
+			.eq('id', currentGameRound.id);
+			
+		if (error) {
+			console.error('Failed to save timer duration:', error);
+			return false;
+		}
+		
+		return true;
+	}
+
+	async subscribeRoundTimer() {
+    supabase
+        .channel('round_timers')
+        .on(
+            'postgres_changes',
+            {
+                event: 'UPDATE',
+                schema: 'public',
+                table: 'game_rounds',
+                filter: `game_id=eq.${this.getGameId()}`
+            },
+            (payload) => {
+                const updatedRound = payload.new as GameRound;
+                
+                // Only update timer state if this is for the current round
+                if (updatedRound.round === this.currentRound) {
+                    if (updatedRound.timer_duration) {
+                        this.roundTimerDuration = updatedRound.timer_duration;
+                    }
+                }
+                
+                // Update the game rounds array
+                this.gameRounds = this.gameRounds.map(round => 
+                    round.id === updatedRound.id ? { ...round, ...updatedRound } : round
+                );
+            }
+        )
+        .subscribe();
+	}
+
+	async updatePlayerAnswer(answerId: number, newText: string) {
+		try {
+			const { error } = await supabase
+				.from('player_answers')
+				.update({ answer: newText })
+				.eq('id', answerId);
+				
+			if (error) throw error;
+			
+			// Update local state
+			this.playersAnswers = this.playersAnswers.map(answer => 
+				answer.id === answerId ? { ...answer, answer: newText } : answer
+			);
+			
+			return true;
+		} catch (error) {
+			console.error('Error updating answer:', error);
+			return false;
+		}
 	}
 }

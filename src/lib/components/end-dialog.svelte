@@ -11,6 +11,7 @@
 	import { CHARACTER } from '../data/characters';
 	import { Label, Switch } from 'bits-ui';
 	import { goto } from '$app/navigation';
+	import { Textarea } from './ui/textarea';
 
 	let audio: HTMLAudioElement;
 	onMount(() => {
@@ -24,25 +25,42 @@
 	}
 
 	let { open = $bindable(false), gameState }: EndDialogProps = $props();
+	let currentPlayerId = $state(gameState?.playerId || -1);
 
 	let storiesByPlayer = $derived.by(() => {
-		const grouped: Record<string, { player: Player; answers: PlayerAnswer[] }> = {};
+		const stories: Array<{ player: Player; answers: PlayerAnswer[]; isCurrent: boolean }> = [];
 
-		if (!gameState) return {};
+		if (!gameState) return [];
+		const currentPlayer = gameState.players.find((p) => p.id === currentPlayerId);
 
-		Object.values(gameState.players).forEach((player) => {
-			// Get all answers by this player
-			const playerAnswers = gameState.playersAnswers.filter(
-				(answer) => answer.player_id === player.id
-			);
+		if (currentPlayer) {
+			const playerAnswers = gameState.playersAnswers
+				.filter((answer) => answer.player_id === currentPlayerId)
+				.sort((a, b) => a.round - b.round);
 
-			grouped[player.id] = {
+			// Add current player as the first element
+			stories.push({
+				player: currentPlayer,
+				answers: playerAnswers,
+				isCurrent: true
+			});
+		}
+
+		gameState.players.forEach((player) => {
+			// Skip the current player as we already added them
+			if (player.id === currentPlayerId) return;
+
+			const playerAnswers = gameState.playersAnswers
+				.filter((answer) => answer.player_id === player.id)
+				.sort((a, b) => a.round - b.round);
+
+			stories.push({
 				player,
-				answers: playerAnswers.sort((a, b) => a.round - b.round)
-			};
+				answers: playerAnswers,
+				isCurrent: false
+			});
 		});
-
-		return grouped;
+		return stories;
 	});
 
 	function getTranslation(key: string | null | undefined): string {
@@ -114,7 +132,7 @@
 		audio.play();
 		if (!saveStory) {
 			console.log('Story not saved. Returning to main menu.');
-			goto(localizeHref('/'));
+			goto(localizeHref('/stories'));
 		} else {
 			// Logic to save the story
 			const id = await gameState.saveStory(playerName, storyTitle);
@@ -122,6 +140,53 @@
 			// Reset the form
 			playerName = '';
 			storyTitle = '';
+		}
+	}
+
+	let editMode = $state(false);
+	let editingAnswerId = $state<string | null>(null);
+	let editedContent = $state('');
+
+	function startEditing(answer: PlayerAnswer) {
+		if (!editMode) return;
+
+		editingAnswerId = `${answer.player_id}-${answer.round}`;
+		editedContent = answer.answer;
+	}
+
+	async function saveEdit(answer: PlayerAnswer) {
+		if (!editingAnswerId || !editMode) return;
+
+		if (answer) {
+			try {
+				// Call the gameState method to update the answer
+				await gameState.updatePlayerAnswer(answer.id, editedContent);
+			} catch (error) {
+				console.error('Failed to save edit:', error);
+			}
+		}
+
+		// Reset editing state
+		editingAnswerId = null;
+		editedContent = '';
+		editMode = false;
+	}
+
+	function cancelEdit() {
+		editMode = false;
+		editingAnswerId = null;
+		editedContent = '';
+	}
+
+	// Function to toggle edit mode
+	function handleEdit(answer: PlayerAnswer) {
+		audio.play();
+		editMode = !editMode;
+		if (editMode === false) {
+			cancelEdit();
+		} else {
+			editMode = true;
+			startEditing(answer);
 		}
 	}
 </script>
@@ -136,15 +201,18 @@
 			<p class="text-dark-green font-bold text-4xl text-center">{m.thanks_for_playing()}</p>
 		</div>
 		<div class="flex flex-col lg:flex-row gap-4 p-4 h-full">
-			<div
-				class="overflow-y-auto flex flex-col flex-grow border-2 border-dark-green rounded-lg w-full max-w-full sm:max-w-[75ch]"
-			>
-				<h2 class="text-xl font-bold text-dark-green p-2">{m.your_story()}</h2>
-
+			<div class="overflow-y-auto flex flex-col flex-grow w-full max-w-full sm:max-w-[75ch]">
 				{#if Object.keys(storiesByPlayer).length > 0}
 					<div class="space-y-8">
-						{#each Object.values(storiesByPlayer) as playerData}
-							<div class="border rounded-lg overflow-hidden">
+						{#each storiesByPlayer as playerData, index}
+							<div
+								class="border-2 {playerData.isCurrent
+									? 'border-dark-green'
+									: 'border-gray-300'} rounded-lg overflow-hidden"
+							>
+								<h2 class="text-xl font-bold text-dark-green p-2">
+									{playerData.isCurrent ? m.your_story() : m.others_stories()}
+								</h2>
 								<div class="bg-gray-50 p-4 flex items-center gap-3 border-b">
 									<div class="w-16 h-16 rounded-full overflow-hidden flex-shrink-0">
 										<img
@@ -154,7 +222,9 @@
 										/>
 									</div>
 									<div>
-										<h3 class="font-bold text-2xl text-dark-green">{playerData.player.nickname}</h3>
+										<h3 class="font-bold text-2xl text-dark-green">
+											{playerData.player.nickname}
+										</h3>
 										<p class="text-sm text-gray-500 capitalize">
 											{playerData.player.character
 												? getCharacterName(playerData.player.character)
@@ -165,12 +235,9 @@
 
 								<div class="flex flex-col items-start pointer w-full">
 									{#each playerData.answers as answer}
-										<button
-											class="p-2 w-full text-left hover:bg-gray-100"
-											onclick={() => toggleAnswerExpansion(`${answer.player_id}-${answer.round}`)}
-										>
-											{#if isAnswerExpanded(`${answer.player_id}-${answer.round}`)}
-												<div class="flex gap-4 mb-2 animate-fade-in">
+										{#if playerData.isCurrent && editingAnswerId === `${answer.player_id}-${answer.round}`}
+											<div class="w-full p-3 bg-gray-50 border-1 border-gray-300">
+												<div class="flex gap-4 mb-2">
 													{#if answer.round === 0}
 														<div
 															class="flex gap-1 items-start text-sm font-semibold text-dark-green"
@@ -195,11 +262,83 @@
 														</p>
 													{/if}
 												</div>
-											{/if}
-											<p class="px-4 text-left w-full break-words whitespace-pre-wrap">
-												{answer.answer}
-											</p>
-										</button>
+
+												<Textarea
+													bind:value={editedContent}
+													class="w-full min-h-32 p-3 border-2 border-dark-green rounded-md focus:ring-dark-green focus:outline-none"
+													placeholder="Edit your answer..."
+												></Textarea>
+
+												<div class="flex justify-end gap-2 mt-2">
+													<Button variant="outline" size="default" onclick={cancelEdit}
+														>{m.cancel()}</Button
+													>
+													<Button
+														variant="default"
+														size="default"
+														onclick={() => saveEdit(answer)}
+														data-answer-id={`${answer.player_id}-${answer.round}`}
+													>
+														{m.save()}
+													</Button>
+												</div>
+											</div>
+										{:else}
+											<div class="w-full p-4 hover:bg-gray-100">
+												<div class="flex justify-between gap-4">
+													<button
+														class="w-full text-left"
+														onclick={() =>
+															toggleAnswerExpansion(`${answer.player_id}-${answer.round}`)}
+													>
+														{#if isAnswerExpanded(`${answer.player_id}-${answer.round}`)}
+															<div class="flex gap-4 mb-2 animate-fade-in">
+																{#if answer.round === 0}
+																	<div
+																		class="flex gap-1 items-start text-sm font-semibold text-dark-green"
+																	>
+																		<span>{m.intro()}</span>
+																	</div>
+																{:else if answer.round === 7}
+																	<div
+																		class="flex gap-1 items-start text-sm font-semibold text-dark-green"
+																	>
+																		<span>{m.post_story()}</span>
+																	</div>
+																{:else}
+																	<div
+																		class="flex gap-1 items-start text-sm font-semibold text-dark-green"
+																	>
+																		<span>{m.round()}</span>
+																		<span>{answer.round}</span>
+																	</div>
+																	<p
+																		class="text-sm text-gray-500 italic break-words whitespace-pre-wrap"
+																	>
+																		"{getCardText(answer.player_id, answer.round)}"
+																	</p>
+																{/if}
+															</div>
+														{/if}
+														<p class="px-4 text-left w-full break-words whitespace-pre-wrap">
+															{answer.answer}
+														</p>
+													</button>
+													{#if playerData.isCurrent && editMode === false}
+														<div class="align-self-end">
+															<Button
+																variant={editMode ? 'default' : 'outline'}
+																size="default"
+																class=""
+																onclick={() => handleEdit(answer)}
+															>
+																{m.edit()}
+															</Button>
+														</div>
+													{/if}
+												</div>
+											</div>
+										{/if}
 									{/each}
 								</div>
 							</div>

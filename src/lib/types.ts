@@ -73,7 +73,9 @@ export type PlayerId = Database['public']['Tables']['players']['Row']['id'];
 
 export type Player = Database['public']['Tables']['players']['Row'];
 
-export type GameRound = Database['public']['Tables']['game_rounds']['Row'];
+export type GameRound = Database['public']['Tables']['game_rounds']['Row'] & {
+  timer_duration?: number;
+};
 
 export type PlayerMove = Database['public']['Tables']['player_moves']['Row'];
 
