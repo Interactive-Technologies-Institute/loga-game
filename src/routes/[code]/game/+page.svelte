@@ -174,6 +174,7 @@
 				round={gameState.currentRound}
 				currentRound={gameState.currentRound}
 				{transitionState}
+				isCurrentPlayer={player.id === data.playerId}
 			/>
 		{/each}
 	</div>

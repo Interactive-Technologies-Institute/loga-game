@@ -1,30 +1,68 @@
 <script lang="ts">
-	import { Hourglass } from 'lucide-svelte';
-	import { onDestroy } from 'svelte';
+	import type { GameState } from '@/state/game-state.svelte';
+	import { Hourglass, Inspect } from 'lucide-svelte';
+	import { onDestroy, onMount } from 'svelte';
+	import tick_sound from '@/sounds/tick_sound.mp3';
+
 	interface TimerProps {
-		minutes: number;
+		gameState: GameState;
 		onTimeUp: () => void;
 	}
 
-	let { minutes = 0, onTimeUp }: TimerProps = $props();
+	let { gameState, onTimeUp }: TimerProps = $props();
 
-	let timeLeft: number = $state(minutes * 60);
+	let tickSound: HTMLAudioElement;
+
+	let individualTimerStart = $state(0);
+
+	onMount(() => {
+		tickSound = new Audio(tick_sound); // Use your tick sound file
+		tickSound.volume = 0.2;
+		if (timerDuration > 0 && individualTimerStart === 0) {
+			individualTimerStart = Date.now();
+		}
+	});
+
+	let timerDuration = $derived.by(() => gameState.roundTimerDuration);
+	let timeLeft: number = $derived.by(() => timerDuration);
 	let intervalId: ReturnType<typeof setInterval>;
 	let isUnderOneMinute = $derived.by(() => timeLeft < 60);
 
-	// Reset timer when minutes changes
 	$effect(() => {
-		timeLeft = minutes * 60;
-		if (intervalId) {
-			clearInterval(intervalId);
-		}
-		intervalId = setInterval(() => {
-			timeLeft -= 1;
-			if (timeLeft <= 0) {
-				clearInterval(intervalId);
-				onTimeUp();
+		if (gameState.roundTimerDuration) {
+			if (individualTimerStart === 0) {
+				individualTimerStart = Date.now();
 			}
-		}, 1000);
+
+			// Clear any existing interval
+			if (intervalId) {
+				clearInterval(intervalId);
+			}
+
+			// Calculate time left based on the global timer
+			const updateTimeLeft = () => {
+				const now = Date.now();
+				const elapsedSeconds = Math.floor((now - individualTimerStart) / 1000);
+				timeLeft = Math.max(0, timerDuration - elapsedSeconds);
+
+				if (timeLeft <= 60) {
+					tickSound.play().catch((err) => console.error('Error playing warning sound:', err));
+				}
+
+				if (timeLeft <= 0) {
+					tickSound.pause();
+					tickSound.currentTime = 0;
+					clearInterval(intervalId);
+					onTimeUp();
+				}
+			};
+
+			// Initial update
+			updateTimeLeft();
+
+			// Set interval for updates
+			intervalId = setInterval(updateTimeLeft, 1000);
+		}
 	});
 
 	let formattedTime = $derived.by(() => {
@@ -35,10 +73,14 @@
 
 	onDestroy(() => {
 		if (intervalId) clearInterval(intervalId);
+		if (tickSound) {
+			tickSound.pause();
+			tickSound.currentTime = 0;
+		}
 	});
 
 	let progressWidth = $derived.by(() => {
-		return (timeLeft / (minutes * 60)) * 100;
+		return (timeLeft / timerDuration) * 100;
 	});
 </script>
 

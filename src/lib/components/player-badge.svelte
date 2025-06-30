@@ -11,6 +11,7 @@
 		currentRound: number;
 		tourCompleted: boolean;
 		transitionState: 'starting' | 'transitioning' | 'ending' | 'ended';
+		isCurrentPlayer?: boolean;
 	}
 
 	let {
@@ -19,7 +20,8 @@
 		round,
 		currentRound,
 		tourCompleted,
-		transitionState
+		transitionState,
+		isCurrentPlayer = false
 	}: PlayerBadgeProps = $props();
 	let isVisible = $state(true);
 	let isExiting = $state(false);
@@ -77,6 +79,12 @@
 	});
 	function getMessage() {
 		if (currentRound === 0) {
+			if (playerState.state === 'done') {
+				return {
+					title: m.intro(),
+					subtitle: m.you_are_done()
+				};
+			}
 			return {
 				title: m.game_is_starting(),
 				subtitle:
@@ -108,7 +116,9 @@
 	}
 </script>
 
-<div class="rounded-full w-12 h-12 sm:h-16 sm:w-16 relative player-badges">
+<div
+	class="rounded-full w-12 h-12 sm:h-16 sm:w-16 relative {isCurrentPlayer ? 'player-badges' : ''}"
+>
 	{#if isVisible}
 		<div
 			class="absolute bg-white flex flex-col items-start justify-center w-max h-12 sm:h-16 pl-10 lg:pl-12 pr-4 lg:pr-6 rounded-br-full rounded-tr-full left-1/2 z-10 {isExiting

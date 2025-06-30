@@ -15,8 +15,6 @@
 	import Timer from './timer.svelte';
 	import PostStory from './post-story-icon.svelte';
 
-	let timerMinutes: number = $state(2);
-
 	let audio: HTMLAudioElement;
 	let click_sound: HTMLAudioElement;
 
@@ -46,8 +44,10 @@
 	});
 	$effect(() => {
 		if (open && playerState === 'writing') {
-			timerMinutes = Math.floor(Math.random() * 3) + 2;
-
+			const currentGameRound = gameState.gameRounds.find((r) => r.round === currentRound);
+			if (currentGameRound && !currentGameRound.timer_duration) {
+				gameState.startRoundTimer();
+			}
 			audio.play();
 			setTimeout(() => {
 				const round = document.getElementById(`round-${currentRound}`);
@@ -67,13 +67,24 @@
 	});
 	let currentAnswer = $state('');
 
-	function onSubmit() {
+	function submitAnswer() {
 		if (playerState === 'writing') {
-			click_sound.play();
-			gameState.submitAnswer(currentAnswer);
+			if (currentAnswer.trim() === '') {
+				gameState.submitAnswer('(Empty submission)');
+				alert(
+					"You didn't write anything for this round! You can edit your story at the end of the game."
+				);
+			} else {
+				gameState.submitAnswer(currentAnswer);
+			}
 			open = false;
 			currentAnswer = '';
 		}
+	}
+
+	function onSubmit() {
+		click_sound.play();
+		submitAnswer();
 	}
 
 	function getTranslation(key: string | null | undefined): string {
@@ -88,12 +99,9 @@
 	}
 
 	function handleTimeUp() {
-		if (currentAnswer) {
-			onSubmit();
-		} else {
-			open = false;
-		}
+		submitAnswer();
 	}
+
 	let playerState = $derived.by(() => {
 		return gameState.playersState[gameState.playerId].state;
 	});
@@ -176,7 +184,7 @@
 						</div>
 						<div class=" flex items-center justify-between gap-3 bg-white">
 							{#if open && playerState === 'writing'}
-								<Timer minutes={timerMinutes} onTimeUp={handleTimeUp} />
+								<Timer {gameState} onTimeUp={handleTimeUp} />
 							{/if}
 							<Button onclick={onSubmit}>{m.submit()}</Button>
 						</div>

@@ -5,7 +5,6 @@ import type { SavedStory } from '$lib/types';
 const ITEMS_PER_PAGE = 5;
 
 export const load = (async ({ url }) => {
-	console.log('Loading stories...');
 	// Get all query parameters with explicit null checks
 	const page = url.searchParams.has('page') ? parseInt(url.searchParams.get('page')!) : 1;
 	const search = url.searchParams.get('search') ?? '';
@@ -15,6 +14,7 @@ export const load = (async ({ url }) => {
 
 	// Start building the query
 	let query = supabase.from('saved_stories').select('*', { count: 'exact' });
+	query = query.eq('public_story', true);
 
 	if (search.trim()) {
 		const searchTerms = search

@@ -9,7 +9,6 @@
 	import clickSound from '@/sounds/click.mp3';
 	import typeSound from '@/sounds/typing-sound.mp3';
 	import { onMount } from 'svelte';
-	import type { H } from 'vitest/dist/chunks/environment.LoooBwUu.js';
 
 	let type_sound: HTMLAudioElement;
 	let click_sound: HTMLAudioElement;
