@@ -100,12 +100,13 @@
 				class="w-full h-full object-cover"
 				class:grayscale={taken}
 			/>
-			<div class="absolute inset-0 mb-2 px-1 pb-2 flex flex-col justify-end text-center gap-2">
+			<div
+				class="absolute inset-0 translate-y-20 px-3 flex flex-col items-center justify-center text-center gap-2"
+			>
 				<h3 class={`text-2xl font-bold ${!taken ? 'text-dark-green' : 'text-black'}`}>
 					{getTranslation(characterDetails?.title)}
 				</h3>
-				<p class="text-xs font-medium">{getTranslation(characterDetails?.description)}</p>
-				<p class="text-xs italic">{getTranslation(characterDetails?.secondary)}</p>
+				<p class="text-sm font-medium">{getTranslation(characterDetails?.description)}</p>
 			</div>
 		</button>
 
@@ -115,7 +116,7 @@
 		>
 			<Input placeholder={m.nickname()} bind:value={nickname} disabled={ready} />
 			<Textarea
-				placeholder={m.description()}
+				placeholder={getTranslation(characterDetails?.secondary)}
 				class="flex-grow"
 				bind:value={description}
 				disabled={ready}

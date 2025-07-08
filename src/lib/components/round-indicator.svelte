@@ -47,7 +47,11 @@
 	});
 </script>
 
-<div class={cn('absolute top-4 inset-x-0 flex flex-col items-center gap-1 md:gap-2 lg:gap-4')}>
+<div
+	class={cn(
+		'absolute top-4 inset-x-0 flex flex-col items-center gap-1 md:gap-2 lg:gap-4 w-fit m-auto'
+	)}
+>
 	<div
 		class="round-indicator flex items-center max-w-20 md:max-w-fit px-4 overflow-x-auto snap-x snap-mandatory scrollbar-hide sm:overflow-hidden"
 	>

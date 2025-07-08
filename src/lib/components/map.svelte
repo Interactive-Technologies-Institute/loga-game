@@ -6,11 +6,12 @@
 	import { onMount } from 'svelte';
 
 	interface MapProps {
+		tourCompleted: boolean;
 		gameState: GameState;
 		position: MapPosition;
 	}
 
-	let { gameState, position }: MapProps = $props();
+	let { gameState, position, tourCompleted }: MapProps = $props();
 
 	let dice = $derived.by(() => {
 		const currentRound = gameState.gameRounds.find(
@@ -59,7 +60,7 @@
 
 <!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
 <div
-	class="bg-[#D8EFF4] w-full h-full overflow-hidden touch-none relative will-change-transform"
+	class="bg-[#D8EFF4] w-full h-full overflow-hidden touch-none relative"
 	bind:this={mapContainer}
 	onwheel={position.zoom}
 	onmousedown={position.startDrag}
@@ -73,25 +74,24 @@
 	aria-label="Game map area"
 >
 	<div
-		class="origin-center relative w-full h-full touch-pan-x touch-pan-y will-change-transform"
+		class="origin-center relative w-full h-full touch-pan-x touch-pan-y"
 		style={`transform: scale(${position.scale}) translate(${position.x}px, ${position.y}px);`}
 	>
 		<div class="absolute h-[50vh] w-[70vw] inset-0 m-auto pointer-events-none map-highlight"></div>
 		<img
 			src="/images/map.svg"
 			alt="Game Map"
-			class="absolute inset-0 w-full h-full pointer-events-none select-none will-change-transform"
+			class="absolute inset-0 w-full h-full pointer-events-none select-none"
 			draggable="false"
-			fetchpriority="high"
 		/>
 		<svg
 			viewBox="0 0 2834.65 2267.72"
 			class="absolute inset-0 w-full h-full"
-			style="pointer-events: {position.hasMovedBeyondThreshold ? 'none' : 'auto'}"
+			style="pointer-events: {position.hasMovedBeyondThreshold ? 'none' : 'auto'};"
 		>
 			{#each gameState.stops as stop (stop.id)}
 				{@const selectable = selectableStops.includes(stop.id)}
-				<Stop {stop} {selectable} onSelect={handleStopClick} />
+				<Stop {stop} {selectable} onSelect={handleStopClick} {tourCompleted} />
 
 				{@const playersHere = Object.entries(gameState.players)
 					.filter(([_, player]) => gameState.playersState[player.id].stop_id === stop.id)
@@ -131,6 +131,11 @@
 </div>
 
 <style>
+	/* .vector-image {
+		image-rendering: optimizeQuality;
+		shape-rendering: geometricPrecision;
+		text-rendering: geometricPrecision;
+	} */
 	@keyframes pulse-badge {
 		0%,
 		100% {
@@ -147,7 +152,7 @@
 		transform-box: fill-box;
 	}
 	/* Optimize rendering performance */
-	img {
+	/* img {
 		backface-visibility: hidden;
 		-webkit-backface-visibility: hidden;
 		-webkit-transform: translateZ(0);
@@ -157,8 +162,15 @@
 		transform: translateZ(0);
 	}
 
-	/* Force hardware acceleration */
+	@supports (transform-style: preserve-3d) {
+		.origin-center {
+			transform-style: preserve-3d;
+		}
+	}
 	.will-change-transform {
 		will-change: transform;
-	}
+		-webkit-transform: translateZ(0);
+		-moz-transform: translateZ(0);
+		transform: translateZ(0);
+	} */
 </style>
