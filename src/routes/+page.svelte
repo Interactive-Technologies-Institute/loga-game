@@ -72,38 +72,70 @@
 	}
 </script>
 
-<div class="h-screen flex flex-col items-center justify-center bg-white">
-	<h1 class="flex items-center justify-center text-dark-green font-bold text-5xl md:text-7xl mb-9">
-		LoGaCulture
-	</h1>
-	<div class="flex items-center justify-center mt-4">
-		<Button
-			variant="outline"
-			size="lg"
-			href={localizeUrl('/stories')}
-			class="text-dark-green hover:text-dark-green/90 mb-4 bg-white hover-bg-gray-100 transition-all duration-200 ease-in-out"
-		>
-			{m.browse_stories()}
-		</Button>
+<div class="h-screen flex flex-col items-center justify-center bg-[#efe7e2] relative">
+	<div
+		class="absolute right-16 top-24 w-32 h-32 sm:w-44 sm:h-44 md:w-48 md:h-48 lg:w-64 lg:h-64 flex items-center justify-center"
+	>
+		<img src="/images/illustrations/step_2_1.png" alt="" class="w-full h-full object-contain" />
 	</div>
-	<div class="flex flex-col items-stretch justify-center gap-4">
-		<p class="flex items-center justify-center text-dark-green font-medium">
-			{m.label_join_game()}
+	<div
+		class="absolute right-16 bottom-24 w-32 h-32 sm:w-44 sm:h-44 md:w-48 md:h-48 lg:w-64 lg:h-64 flex items-center justify-center"
+	>
+		<img src="/images/illustrations/step_4_1.png" alt="" class="w-full h-full object-contain" />
+	</div>
+	<div
+		class="absolute left-16 top-24 w-32 h-32 sm:w-44 sm:h-44 md:w-48 md:h-48 lg:w-64 lg:h-64 flex items-center justify-center"
+	>
+		<img src="/images/illustrations/step_5_1.png" alt="" class="w-full h-full object-contain" />
+	</div>
+	<div
+		class="absolute left-16 bottom-24 w-32 h-32 sm:w-44 sm:h-44 md:w-48 md:h-48 lg:w-64 lg:h-64 flex items-center justify-center"
+	>
+		<img src="/images/illustrations/step_6_1.png" alt="" class="w-full h-full object-contain" />
+	</div>
+	<div class="z-10 flex flex-col items-center justify-center max-w-md">
+		<h1 class="flex items-center justify-center text-dark-green font-black text-5xl md:text-7xl">
+			LoGaCulture
+		</h1>
+		<p class="text-dark-green text-center text-lg mb-5 italic">
+			"Create your own story from the perspective of a character in the island of Madeira."
 		</p>
-		<InputCode.Root maxlength={6} bind:value={code}>
-			{#snippet children({ cells })}
-				<InputCode.Group>
-					{#each cells as cell}
-						<InputCode.Slot {cell} />
-					{/each}
-				</InputCode.Group>
-			{/snippet}
-		</InputCode.Root>
-		<Button size="lg" onclick={joinGame}>{m.join_game()}</Button>
-		<p class="text-dark-green text-center text-lg font-bold">{m.or()}</p>
-		<Button size="lg" onclick={createGame}>{m.create_game()}</Button>
+		<div
+			class="w-full flex flex-col items-stretch justify-center gap-4 mt-4 p-4 rounded-lg bg-white border-2 border-sense-red/20"
+		>
+			<div class="flex flex-col items-center justify-center">
+				<Button size="lg" onclick={createGame}>{m.start_new_game()}</Button>
+			</div>
+			<p class="text-dark-green text-center text-lg font-bold">{m.or()}</p>
+			<div class="w-full flex flex-col items-center justify-center gap-4">
+				<p class="flex items-center justify-center text-dark-green font-medium">
+					{m.label_join_game()}
+				</p>
+				<InputCode.Root maxlength={6} bind:value={code}>
+					{#snippet children({ cells })}
+						<InputCode.Group>
+							{#each cells as cell}
+								<InputCode.Slot {cell} />
+							{/each}
+						</InputCode.Group>
+					{/snippet}
+				</InputCode.Root>
+				<Button size="lg" onclick={joinGame}>{m.join_game()}</Button>
+			</div>
+			<p class="text-dark-green text-center text-lg font-bold">{m.or()}</p>
+			<div class="flex flex-col items-center justify-center">
+				<Button
+					variant="outline"
+					size="lg"
+					href={localizeUrl('/stories').toString()}
+					class="text-dark-green hover:text-dark-green/90 mb-4 bg-white hover-bg-gray-200 transition-all duration-200 ease-in-out border-dark-green/20 hover:border-dark-green/90"
+				>
+					{m.browse_stories()}
+				</Button>
+			</div>
+		</div>
 
-		<div class="flex items-center justify-center gap-2">
+		<div class="absolute top-4 right-4">
 			<select
 				class="p-2 border rounded"
 				bind:value={selectedLanguage}

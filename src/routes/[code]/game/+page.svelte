@@ -143,23 +143,26 @@
 /> -->
 
 <div class="w-screen h-[100dvh] relative">
-	<Map {gameState} position={mapPosition} />
+	<Map {gameState} position={mapPosition} {tourCompleted} />
 	<MiniMap position={mapPosition} />
 	<RoundIndicator rounds={gameState.rounds} currentRound={gameState.currentRound} />
 	<Button
 		size="lg"
 		onclick={() => (openStoryDialog = true)}
 		class="absolute bottom-4 left-1/2 -translate-x-1/2 story-button rounded-full px-4"
+		disabled={!tourCompleted}
 	>
 		<ScrollText />
 		{m.story_sheet()}
 	</Button>
 	<StoryDialog bind:open={openStoryDialog} {gameState} />
 	<Button
-		size="icon-lg"
+		size="default"
 		onclick={() => (openHelpDialog = true)}
 		class="absolute top-4 right-4 help-button"
+		disabled={!tourCompleted}
 	>
+		{m.help()}
 		<CircleHelp />
 	</Button>
 	<HelpDialog bind:open={openHelpDialog} />

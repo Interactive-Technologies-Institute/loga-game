@@ -51,10 +51,49 @@
 	}
 </script>
 
-<div class="h-full flex flex-col items-center justify-center bg-white">
-	<div class="bg-dark-green px-5 py-2 flex flex-col items-center justify-center rounded-lg mt-5">
-		<p class="text-white text-sm font-medium">{m.label_join_code()}</p>
-		<p class="text-white text-4xl font-bold">{data.game.code}</p>
+<div class="h-full flex flex-col items-center justify-center bg-white relative">
+	<div
+		class="sticky top-0 z-10 w-full bg-white border-b shadow-sm py-2 px-4 flex justify-between items-center"
+	>
+		<div class="bg-dark-green p-2 flex flex-col items-center justify-center rounded-lg">
+			<p class="text-white md:text-sm text-xs font-medium">{m.label_join_code()}</p>
+			<p class="text-white lg:text-4xl md:text-xl text-md font-bold">{data.game.code}</p>
+		</div>
+
+		<div class="flex gap-3">
+			{#if selectionStep === 'category'}
+				<Button
+					disabled={selectedCategory === null}
+					onclick={proceedToCharacterSelection}
+					size="default"
+				>
+					<span class="text-lg">{m.continue()}</span>
+				</Button>
+			{/if}
+			{#if selectionStep === 'character'}
+				<div class="flex items-center justify-center gap-3 mb-5">
+					<Button
+						variant={'outline'}
+						size="default"
+						onclick={goBackToCategories}
+						class="mr-2"
+						disabled={currentPlayer.nickname !== null}>{m.back()}</Button
+					>
+					{#if currentPlayer.is_owner}
+						<Button
+							size="default"
+							disabled={gameState.state !== 'ready'}
+							onclick={() => {
+								click.play();
+								gameState.startGame();
+							}}
+						>
+							{m.start_game()}
+						</Button>
+					{/if}
+				</div>
+			{/if}
+		</div>
 	</div>
 
 	{#if selectionStep === 'category'}
@@ -102,13 +141,6 @@
 					</p>
 				</button>
 			</div>
-			<Button
-				disabled={selectedCategory === null}
-				onclick={proceedToCharacterSelection}
-				class="mt-2 mb-5"
-			>
-				<span class="text-lg">{m.continue()}</span>
-			</Button>
 		</div>
 	{:else if selectionStep === 'character'}
 		<p class="text-dark-green text-lg font-bold my-2">{m.select_character()}</p>
@@ -128,35 +160,13 @@
 			{/each}
 		</div>
 	{/if}
-
-	<p class="text-dark-green text-lg font-bold mb-4">
-		{#if gameState.state === 'waiting'}
-			{m.waiting_for_players()}
-		{:else}
-			{m.players_ready()}
-		{/if}
-	</p>
-	{#if selectionStep === 'character'}
-		<div class="flex items-center justify-center gap-3 mb-5">
-			<Button
-				variant={'outline'}
-				size="lg"
-				onclick={goBackToCategories}
-				class="mr-2"
-				disabled={currentPlayer.nickname !== null}>{m.back()}</Button
-			>
-			{#if currentPlayer.is_owner}
-				<Button
-					size="lg"
-					disabled={gameState.state !== 'ready'}
-					onclick={() => {
-						click.play();
-						gameState.startGame();
-					}}
-				>
-					{m.start_game()}
-				</Button>
+	<div class="bg-white py-4 px-6 border-t">
+		<p class="text-dark-green text-lg font-bold mb-4">
+			{#if gameState.state === 'waiting'}
+				{m.waiting_for_players()}
+			{:else}
+				{m.players_ready()}
 			{/if}
-		</div>
-	{/if}
+		</p>
+	</div>
 </div>

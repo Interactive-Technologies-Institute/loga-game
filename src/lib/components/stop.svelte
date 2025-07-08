@@ -10,12 +10,13 @@
 	});
 
 	interface StopProps {
+		tourCompleted: boolean;
 		stop: Stop;
 		selectable: boolean;
 		onSelect: (stopId: StopId) => void;
 	}
 
-	let { stop, selectable, onSelect }: StopProps = $props();
+	let { tourCompleted, stop, selectable, onSelect }: StopProps = $props();
 
 	function handleInteraction(event: Event) {
 		// Prevent default behavior for touch events
@@ -42,17 +43,19 @@
 	<circle cx={stop.x} cy={stop.y} r="24" class="fill-[#FF6157] expand-fade" />
 	<circle cx={stop.x} cy={stop.y} r="24" class="fill-[#FF6157] expand-fade-delayed" />
 	<circle cx={stop.x} cy={stop.y} r="8" class="pulse-red" />
-	<circle
-		role="button"
-		tabindex="0"
-		aria-label="Select stop"
-		onclick={handleInteraction}
-		onkeydown={handleKeyDown}
-		cx={stop.x}
-		cy={stop.y}
-		r="30"
-		class="fill-transparent cursor-pointer"
-	/>
+	{#if tourCompleted}
+		<circle
+			role="button"
+			tabindex="0"
+			aria-label="Select stop"
+			onclick={handleInteraction}
+			onkeydown={handleKeyDown}
+			cx={stop.x}
+			cy={stop.y}
+			r="30"
+			class="fill-transparent cursor-pointer"
+		/>
+	{/if}
 {/if}
 
 <style>

@@ -2,7 +2,7 @@ export class MapPosition {
 	scale = $state(1.2);
 	minScale = $state(1);
 	maxScale = $state(5);
-	initialScale = $state(window.innerWidth < 768 ? 1 : 1.2);
+	initialScale = $state(1);
 	initialPinchDistance = $state(0);
 	x = $state(0);
 	y = $state(0);
