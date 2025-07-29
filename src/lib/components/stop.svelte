@@ -19,10 +19,8 @@
 	let { tourCompleted, stop, selectable, onSelect }: StopProps = $props();
 
 	function handleInteraction(event: Event) {
-		// Prevent default behavior for touch events
-		if (event instanceof TouchEvent) {
-			event.preventDefault();
-		}
+		event.preventDefault();
+		event.stopPropagation();
 
 		onSelect(stop.id);
 		if (audio) {
@@ -52,8 +50,9 @@
 			onkeydown={handleKeyDown}
 			cx={stop.x}
 			cy={stop.y}
-			r="30"
+			r="40"
 			class="fill-transparent cursor-pointer"
+			style="-webkit-tap-highlight-color: transparent;"
 		/>
 	{/if}
 {/if}

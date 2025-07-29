@@ -29,6 +29,35 @@ export class MapPosition {
 		this.scale = this.initialScale;
 	}
 
+	private isTouchEvent(event: MouseEvent | TouchEvent): boolean {
+		return Boolean(
+			typeof window !== 'undefined' &&
+			'TouchEvent' in window &&
+			event instanceof TouchEvent ||
+			(event as TouchEvent).touches !== undefined
+		);
+	}
+
+	private getEventCoordinates(event: MouseEvent | TouchEvent): { clientX: number; clientY: number } {
+        if (this.isTouchEvent(event) && 'touches' in event && event.touches.length > 0) {
+            return {
+                clientX: event.touches[0].clientX,
+                clientY: event.touches[0].clientY
+            };
+        } else if ('clientX' in event) {
+            return {
+                clientX: event.clientX,
+                clientY: event.clientY
+            };
+        }
+        
+        // Fallback
+        return {
+            clientX: 0,
+            clientY: 0
+        };
+    }
+
 	setContainerSize(width: number, height: number) {
 		this.containerWidth = width;
 		this.containerHeight = height;
@@ -99,6 +128,8 @@ export class MapPosition {
 
 	startDrag = (event: MouseEvent | TouchEvent) => {
         if (!(event.currentTarget instanceof HTMLElement)) return;
+        
+        // Don't start drag on interactive elements
         if (
             event.target instanceof HTMLElement &&
             event.target.closest('button, a, input, dialog, [role="button"]')
@@ -106,8 +137,8 @@ export class MapPosition {
             return;
         }
 
-        if (event instanceof TouchEvent && event.touches.length === 2) {
-            // Handle pinch gesture
+        // Handle pinch gesture for touch devices
+        if ('touches' in event && event.touches.length === 2) {
             const touch1 = event.touches[0];
             const touch2 = event.touches[1];
             this.initialPinchDistance = Math.hypot(
@@ -117,96 +148,94 @@ export class MapPosition {
             return;
         }
 
-		this.touchStartTime = Date.now();
+        this.touchStartTime = Date.now();
         this.isTap = true;
 
         this.isDragging = true;
         this.dragEnded = false;
-        const clientX = event instanceof MouseEvent ? event.clientX : event.touches[0].clientX;
-        const clientY = event instanceof MouseEvent ? event.clientY : event.touches[0].clientY;
-
-        this.lastX = clientX;
-        this.lastY = clientY;
-        this.dragStartX = clientX;
-        this.dragStartY = clientY;
+        
+        const coords = this.getEventCoordinates(event);
+        
+        this.lastX = coords.clientX;
+        this.lastY = coords.clientY;
+        this.dragStartX = coords.clientX;
+        this.dragStartY = coords.clientY;
         this.hasMovedBeyondThreshold = false;
     };
 
 	drag = (event: MouseEvent | TouchEvent) => {
-        // Add check for left mouse button
-        if (event instanceof MouseEvent && event.buttons !== 1) {
+        // Check if it's a mouse event with the left button released
+        if (!this.isTouchEvent(event) && 'buttons' in event && event.buttons !== 1) {
             this.endDrag();
             return;
         }
-		if (!this.isDragging || !(event.currentTarget instanceof HTMLElement)) return;
+        
+        if (!this.isDragging || !(event.currentTarget instanceof HTMLElement)) return;
 
-		if (event instanceof TouchEvent && event.touches.length === 2) {
-			const touch1 = event.touches[0];
-			const touch2 = event.touches[1];
-			const currentDistance = Math.hypot(
-				touch1.clientX - touch2.clientX,
-				touch1.clientY - touch2.clientY
-			);
+        // Handle pinch zoom for touch devices
+        if ('touches' in event && event.touches.length === 2) {
+            const touch1 = event.touches[0];
+            const touch2 = event.touches[1];
+            const currentDistance = Math.hypot(
+                touch1.clientX - touch2.clientX,
+                touch1.clientY - touch2.clientY
+            );
 
-			// Modified scale calculation for more responsive zooming
-			const scaleFactor = currentDistance / this.initialPinchDistance;
-			const zoomDelta = (scaleFactor - 1) * this.PINCH_ZOOM_SENSITIVITY;
-			const scale = this.scale * (1 + zoomDelta);
+            const scaleFactor = currentDistance / this.initialPinchDistance;
+            const zoomDelta = (scaleFactor - 1) * this.PINCH_ZOOM_SENSITIVITY;
+            const scale = this.scale * (1 + zoomDelta);
 
-			this.handlePinchZoom(scale);
-			this.initialPinchDistance = currentDistance;
-			this.isTap = false;
-			return;
-		}
-		if (!this.isDragging) return;
+            this.handlePinchZoom(scale);
+            this.initialPinchDistance = currentDistance;
+            this.isTap = false;
+            return;
+        }
 
-		const clientX = event instanceof MouseEvent ? event.clientX : event.touches[0].clientX;
-		const clientY = event instanceof MouseEvent ? event.clientY : event.touches[0].clientY;
+        const coords = this.getEventCoordinates(event);
+        
+        const deltaX = (coords.clientX - this.lastX) / this.scale;
+        const deltaY = (coords.clientY - this.lastY) / this.scale;
 
-		const deltaX = (clientX - this.lastX) / this.scale; // Scale delta by zoom level
-		const deltaY = (clientY - this.lastY) / this.scale;
+        const distanceFromStart = Math.hypot(coords.clientX - this.dragStartX, coords.clientY - this.dragStartY);
 
-		const distanceFromStart = Math.hypot(clientX - this.dragStartX, clientY - this.dragStartY);
+        // Use a variable threshold that's higher for Safari
+        const effectiveThreshold = /^((?!chrome|android).)*safari/i.test(navigator.userAgent) 
+            ? this.dragThreshold * 1.5 
+            : this.dragThreshold;
 
-		if (distanceFromStart > this.dragThreshold) {
-			this.hasMovedBeyondThreshold = true;
-			this.isTap = false;
-		}
+        if (distanceFromStart > effectiveThreshold) {
+            this.hasMovedBeyondThreshold = true;
+            this.isTap = false;
+        }
 
-		if (this.hasMovedBeyondThreshold) {
-			const newPosition = this.constrainPosition(this.x + deltaX, this.y + deltaY);
-			this.x = newPosition.x;
-			this.y = newPosition.y;
-		}
+        if (this.hasMovedBeyondThreshold) {
+            const newPosition = this.constrainPosition(this.x + deltaX, this.y + deltaY);
+            this.x = newPosition.x;
+            this.y = newPosition.y;
+        }
 
-		this.lastX = clientX;
-		this.lastY = clientY;
-	};
+        this.lastX = coords.clientX;
+        this.lastY = coords.clientY;
+    };
 
 	endDrag = () => {
-        // Check if this was a tap (quick touch without much movement)
         const wasTap = this.isTap && 
                       (Date.now() - this.touchStartTime) < this.TAP_DURATION && 
                       !this.hasMovedBeyondThreshold;
         
-        // For actual taps, we want to allow clicks on stops
         if (wasTap) {
-            // Don't disable pointer events immediately for taps
             this.isDragging = false;
             this.dragEnded = false;
         } else {
-            // For drags, we follow the regular pattern
             this.isDragging = false;
             this.hasMovedBeyondThreshold = false;
             this.dragEnded = true;
             
-            // Reset after a short delay to allow pointer events again
             setTimeout(() => {
                 this.dragEnded = false;
             }, 100);
         }
         
-        // Reset tap detection
         this.isTap = false;
     };
 }
