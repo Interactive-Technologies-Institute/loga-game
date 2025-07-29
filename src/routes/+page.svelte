@@ -72,32 +72,22 @@
 	}
 </script>
 
-<div class="h-screen flex flex-col items-center justify-center bg-[#efe7e2] relative">
-	<div
-		class="absolute right-16 top-24 w-32 h-32 sm:w-44 sm:h-44 md:w-48 md:h-48 lg:w-64 lg:h-64 flex items-center justify-center"
-	>
-		<img src="/images/illustrations/step_2_1.png" alt="" class="w-full h-full object-contain" />
-	</div>
-	<div
-		class="absolute right-16 bottom-24 w-32 h-32 sm:w-44 sm:h-44 md:w-48 md:h-48 lg:w-64 lg:h-64 flex items-center justify-center"
-	>
-		<img src="/images/illustrations/step_4_1.png" alt="" class="w-full h-full object-contain" />
-	</div>
-	<div
-		class="absolute left-16 top-24 w-32 h-32 sm:w-44 sm:h-44 md:w-48 md:h-48 lg:w-64 lg:h-64 flex items-center justify-center"
-	>
-		<img src="/images/illustrations/step_5_1.png" alt="" class="w-full h-full object-contain" />
-	</div>
-	<div
-		class="absolute left-16 bottom-24 w-32 h-32 sm:w-44 sm:h-44 md:w-48 md:h-48 lg:w-64 lg:h-64 flex items-center justify-center"
-	>
-		<img src="/images/illustrations/step_6_1.png" alt="" class="w-full h-full object-contain" />
-	</div>
-	<div class="z-10 flex flex-col items-center justify-center max-w-md">
+<div class="h-screen flex flex-col items-center justify-center bg-[#efe7e2] relative p-4">
+	<div class="z-10 flex flex-col items-center justify-center max-w-md relative">
+		<div
+			class="absolute -left-56 top-0 w-32 h-32 md:w-48 md:h-48 lg:w-52 lg:h-52 flex items-center justify-center"
+		>
+			<img src="/images/illustrations/step_5_1.png" alt="" class="w-full h-full object-contain" />
+		</div>
+		<div
+			class="absolute -right-56 top-0 w-32 h-32 md:w-48 md:h-48 lg:w-52 lg:h-52 flex items-center justify-center"
+		>
+			<img src="/images/illustrations/step_2_1.png" alt="" class="w-full h-full object-contain" />
+		</div>
 		<h1 class="flex items-center justify-center text-dark-green font-black text-5xl md:text-7xl">
 			LoGaCulture
 		</h1>
-		<p class="text-dark-green text-center text-lg mb-5 italic">
+		<p class="text-dark-green text-center text-lg mb-5 px-4 italic">
 			"Create your own story from the perspective of a character in the island of Madeira."
 		</p>
 		<div
@@ -134,17 +124,26 @@
 				</Button>
 			</div>
 		</div>
-
-		<div class="absolute top-4 right-4">
-			<select
-				class="p-2 border rounded"
-				bind:value={selectedLanguage}
-				onchange={(e) => changeLanguage((e.currentTarget as HTMLSelectElement).value as Locale)}
-			>
-				{#each languages as { code, label }}
-					<option value={code}>{label}</option>
-				{/each}
-			</select>
+		<div
+			class="absolute -right-56 bottom-0 w-32 h-32 md:w-48 md:h-48 lg:w-52 lg:h-52 flex items-center justify-center"
+		>
+			<img src="/images/illustrations/step_4_1.png" alt="" class="w-full h-full object-contain" />
 		</div>
+		<div
+			class="absolute -left-56 bottom-0 w-32 h-32 md:w-48 md:h-48 lg:w-52 lg:h-52 flex items-center justify-center"
+		>
+			<img src="/images/illustrations/step_6_1.png" alt="" class="w-full h-full object-contain" />
+		</div>
+	</div>
+	<div class="absolute top-4 right-4">
+		<select
+			class="p-2 border rounded"
+			bind:value={selectedLanguage}
+			onchange={(e) => changeLanguage((e.currentTarget as HTMLSelectElement).value as Locale)}
+		>
+			{#each languages as { code, label }}
+				<option value={code}>{label}</option>
+			{/each}
+		</select>
 	</div>
 </div>
