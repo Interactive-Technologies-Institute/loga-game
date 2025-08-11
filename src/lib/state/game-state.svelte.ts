@@ -92,14 +92,12 @@ export class GameState {
 	}
 
 	private setupActivityTracking() {
-        // Update activity every 30 seconds
         this.activityInterval = setInterval(async () => {
             if (this.code && this.state !== 'finished') {
                 await this.updatePlayerActivity();
             }
         }, 30000);
         
-        // Initial update
         this.updatePlayerActivity();
     }
 
@@ -149,7 +147,7 @@ export class GameState {
 				},
 				body: JSON.stringify({ 
 					code: this.code, 
-					userId: currentPlayer.user_id // ← Get userId from player data
+					userId: currentPlayer.user_id
 				})
 			});
 			
