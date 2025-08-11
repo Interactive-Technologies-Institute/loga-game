@@ -9,7 +9,7 @@
 	import Button from '@/components/ui/button/button.svelte';
 	import { GameState } from '@/state/game-state.svelte';
 	import { MapPosition } from '@/state/map-position.svelte';
-	import { CircleHelp, ScrollText } from 'lucide-svelte';
+	import { CircleHelp, ScrollText, LogOut } from 'lucide-svelte';
 	import type { PageData } from './$types';
 	import EndDialog from '@/components/end-dialog.svelte';
 	import { m } from '@src/paraglide/messages';
@@ -19,6 +19,7 @@
 	import { createGameTour } from '@/components/ui/shepherd/game-tour.svelte.js';
 	import type { Tour } from 'shepherd.js';
 	import RoundTransition from '@/components/round-transition.svelte';
+	import { goto } from '$app/navigation';
 
 	let tour: Tour | undefined;
 
@@ -57,6 +58,7 @@
 			tour.complete();
 			tour.cancel();
 		}
+		gameState.cleanup();
 	});
 
 	let { data }: { data: PageData } = $props();
@@ -128,6 +130,19 @@
 			openEndDialog = true;
 		}
 	});
+
+	async function handleLeaveGame() {
+		const confirmed = confirm('Are you sure you want to leave the game?');
+
+		if (confirmed) {
+			const success = await gameState.markPlayerInactive();
+			if (success) {
+				goto('/');
+			} else {
+				alert('Failed to leave game. Please try again.');
+			}
+		}
+	}
 </script>
 
 <!-- <svelte:window
@@ -159,17 +174,26 @@
 	<Button
 		size="default"
 		onclick={() => (openHelpDialog = true)}
-		class="absolute top-4 right-4 help-button"
+		class="absolute top-4 left-4 help-button"
 		disabled={!tourCompleted}
 	>
 		{m.help()}
 		<CircleHelp />
 	</Button>
 	<HelpDialog bind:open={openHelpDialog} />
+	<Button
+		variant="default"
+		size="default"
+		class="absolute top-4 right-4 exit-button"
+		onclick={handleLeaveGame}
+		disabled={!tourCompleted}
+	>
+		Exit <LogOut size={16} />
+	</Button>
 	<div
 		class="absolute left-4 top-36 flex flex-col items-center justify-center gap-5 pointer-events-none"
 	>
-		{#each Object.values(gameState.players) as player (player.id)}
+		{#each Object.values(gameState.players).filter((p) => p.is_active !== false) as player (player.id)}
 			<PlayerBadge
 				{tourCompleted}
 				{player}

@@ -39,6 +39,8 @@ export class GameState {
 	});
 
     roundTimerDuration: number = $state(0);
+	private activityInterval: ReturnType<typeof setInterval> | null = null;
+    private beforeUnloadHandler: (() => void) | null = null;
 
 	private getGameId(): number {
     // Find a player's game_id (they all share the same game_id)
@@ -75,6 +77,8 @@ export class GameState {
 		this.playersAnswers = playerAnswers;
 
 		this.initializeTimerState();
+		this.setupActivityTracking();
+        this.setupPageUnloadDetection();
 
 
 		this.subscribeGame();
@@ -85,6 +89,114 @@ export class GameState {
 		this.subscribePlayerAnswers();
 		this.subscribeGameRounds();
 		this.subscribeRoundTimer();
+	}
+
+	private setupActivityTracking() {
+        // Update activity every 30 seconds
+        this.activityInterval = setInterval(async () => {
+            if (this.code && this.state !== 'finished') {
+                await this.updatePlayerActivity();
+            }
+        }, 30000);
+        
+        // Initial update
+        this.updatePlayerActivity();
+    }
+
+    private setupPageUnloadDetection() {
+		if (typeof window !== 'undefined') {
+			this.beforeUnloadHandler = () => {
+				// Get current player's userId
+				const currentPlayer = this.players.find(p => p.id === this.playerId);
+				if (!currentPlayer) return;
+
+				// Use sendBeacon with FormData (more reliable than JSON for sendBeacon)
+				const formData = new FormData();
+				formData.append('code', this.code);
+				formData.append('userId', currentPlayer.user_id);
+				
+				navigator.sendBeacon('/api/mark-inactive', formData);
+			};
+			
+			window.addEventListener('beforeunload', this.beforeUnloadHandler);
+			window.addEventListener('pagehide', this.beforeUnloadHandler);
+		}
+	}
+
+    private async updatePlayerActivity() {
+        try {
+            await supabase.rpc('update_player_activity', {
+                game_code: this.code
+            });
+        } catch (error) {
+            console.error('Failed to update player activity:', error);
+        }
+    }
+
+    async markPlayerInactive() {
+		try {
+			// Get userId from the current player in the players array
+			const currentPlayer = this.players.find(p => p.id === this.playerId);
+			if (!currentPlayer) {
+				console.error('Current player not found');
+				return false;
+			}
+
+			const response = await fetch('/api/mark-inactive', {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+				},
+				body: JSON.stringify({ 
+					code: this.code, 
+					userId: currentPlayer.user_id // ← Get userId from player data
+				})
+			});
+			
+			if (response.ok) {
+				// Update local state
+				this.players = this.players.map(p => 
+					p.id === this.playerId ? { ...p, is_active: false } : p
+				);
+				return true;
+			}
+			
+			return false;
+		} catch (err) {
+			console.error("Error marking player inactive:", err);
+			return false;
+		}
+	}
+
+    public cleanup() {
+		// Clear activity tracking interval
+		if (this.activityInterval) {
+			clearInterval(this.activityInterval);
+			this.activityInterval = null;
+		}
+		
+		// Remove page unload event listeners
+		if (typeof window !== 'undefined' && this.beforeUnloadHandler) {
+			window.removeEventListener('beforeunload', this.beforeUnloadHandler);
+			window.removeEventListener('pagehide', this.beforeUnloadHandler);
+			this.beforeUnloadHandler = null;
+		}
+		
+		// Unsubscribe from all Supabase channels
+		supabase.channel('game').unsubscribe();
+		supabase.channel('game_rounds').unsubscribe();
+		supabase.channel('players').unsubscribe();
+		supabase.channel('player_moves').unsubscribe();
+		supabase.channel('player_cards').unsubscribe();
+		supabase.channel('player_answers').unsubscribe();
+		supabase.channel('round_timers').unsubscribe();
+		
+		// Optional: Clear all reactive state arrays to prevent memory leaks
+		this.players = [];
+		this.playersMoves = [];
+		this.playersCards = [];
+		this.playersAnswers = [];
+		this.gameRounds = [];
 	}
 
 	// Add this method to initialize timer state

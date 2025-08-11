@@ -46,20 +46,19 @@
 			});
 		}
 
-		gameState.players.forEach((player) => {
-			// Skip the current player as we already added them
-			if (player.id === currentPlayerId) return;
+		gameState.players
+			.filter((player) => player.is_active !== false && player.id !== currentPlayerId)
+			.forEach((player) => {
+				const playerAnswers = gameState.playersAnswers
+					.filter((answer) => answer.player_id === player.id)
+					.sort((a, b) => a.round - b.round);
 
-			const playerAnswers = gameState.playersAnswers
-				.filter((answer) => answer.player_id === player.id)
-				.sort((a, b) => a.round - b.round);
-
-			stories.push({
-				player,
-				answers: playerAnswers,
-				isCurrent: false
+				stories.push({
+					player,
+					answers: playerAnswers,
+					isCurrent: false
+				});
 			});
-		});
 		return stories;
 	});
 

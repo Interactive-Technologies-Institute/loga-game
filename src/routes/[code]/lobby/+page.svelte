@@ -34,6 +34,7 @@
 		click.currentTime = 0;
 		click.play().catch((e) => console.warn('Error playing sound:', e));
 		selectedCategory = category;
+		proceedToCharacterSelection();
 	}
 
 	function proceedToCharacterSelection() {
@@ -55,8 +56,8 @@
 	<div
 		class="sticky top-0 z-10 w-full bg-white border-b shadow-sm py-2 px-4 flex justify-between items-center"
 	>
-		<div class="bg-dark-green p-2 flex flex-col items-center justify-center rounded-lg">
-			<p class="text-white md:text-sm text-xs font-medium">{m.label_join_code()}</p>
+		<div class="bg-dark-green p-2 flex flex-col items-center justify-center rounded-lg text-center">
+			<p class="text-white md:text-sm text-xs font-medium">Lobby code</p>
 			<p class="text-white lg:text-4xl md:text-xl text-md font-bold">{data.game.code}</p>
 		</div>
 
@@ -71,15 +72,25 @@
 				</Button>
 			{/if}
 			{#if selectionStep === 'character'}
-				<div class="flex items-center justify-center gap-3 mb-5">
-					<Button
-						variant={'outline'}
-						size="default"
-						onclick={goBackToCategories}
-						class="mr-2"
-						disabled={currentPlayer.nickname !== null}>{m.back()}</Button
-					>
+				<div class="flex items-center justify-center">
+					{#if gameState.state === 'waiting' && currentPlayer.nickname === null}
+						<Button
+							variant={'outline'}
+							size="default"
+							onclick={goBackToCategories}
+							class="mr-2"
+							disabled={currentPlayer.nickname !== null}>{m.back()}</Button
+						>
+					{:else if !currentPlayer.is_owner}
+						<p class="text-dark-green font-bold text-center px-2">
+							Waiting for host to start the game...
+						</p>
+					{/if}
+
 					{#if currentPlayer.is_owner}
+						{#if gameState.state === 'ready'}
+							<p class="text-dark-green font-bold text-center px-2">All players are ready!</p>
+						{/if}
 						<Button
 							size="default"
 							disabled={gameState.state !== 'ready'}
@@ -160,13 +171,4 @@
 			{/each}
 		</div>
 	{/if}
-	<div class="bg-white py-4 px-6 border-t">
-		<p class="text-dark-green text-lg font-bold mb-4">
-			{#if gameState.state === 'waiting'}
-				{m.waiting_for_players()}
-			{:else}
-				{m.players_ready()}
-			{/if}
-		</p>
-	</div>
 </div>
