@@ -1,3 +1,4 @@
+import { goto } from '$app/navigation';
 import { supabase } from '@/supabase';
 import type {
 	Card,
@@ -149,6 +150,33 @@ export const load = async ({ params, parent }) => {
 	const playerMoves = await getPlayerMoves(game.id);
 	const playerCards = await getPlayerCards(game.id);
 	const playerAnswers = await getPlayerAnswers(game.id);
+
+	// Check if player was inactive and if they can rejoin
+    if (player.is_active === false) {
+        const currentRound = gameRounds.length > 0 ? gameRounds[gameRounds.length - 1].round : 0;
+        const playerLastRound = Math.max(
+            ...playerMoves.filter(m => m.player_id === player.id).map(m => m.round),
+            ...playerAnswers.filter(a => a.player_id === player.id).map(a => a.round),
+            0
+        );
+        
+        // Don't allow rejoin if too far behind
+        if (currentRound - playerLastRound > 1) {
+			goto("/");
+            return error(403, { 
+                message: 'You cannot rejoin this game as it has progressed too far.' 
+            });
+        }
+        
+        // Reactivate the player
+        await supabase.rpc('update_player_activity', { game_code: code });
+        await supabase
+            .from('players')
+            .update({ is_active: true })
+            .eq('id', player.id);
+        
+        player.is_active = true;
+    }
 
 	return {
 		stops,
