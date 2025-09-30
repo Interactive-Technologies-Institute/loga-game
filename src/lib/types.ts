@@ -18,18 +18,27 @@ export type CardId = Database['public']['Tables']['cards']['Row']['id'];
 
 export type CardType = Database['public']['Enums']['stop_type'];
 
+export type CharacterCategory = 'human' | 'non-human';
+
 export type Card = {
 	id: number;
 	type: CardType;
 	title: string | null;
+	text: string;
+	hero_steps: number[];
+	character_category: CharacterCategory;
+};
+
+export type CardPrompt = {
+	id: number;
+	card_id: number;
+	lang: 'en' | 'pt';
 	text: string;
 };
 
 export type Round = Database['public']['Tables']['rounds']['Row'];
 
 export type Character = Database['public']['Enums']['character_type'];
-
-export type CharacterCategory = 'human' | 'non-human';
 
 export const CHARACTER_CATEGORIES: Record<CharacterCategory, Character[]> = {
 	human: [
@@ -74,7 +83,7 @@ export type PlayerId = Database['public']['Tables']['players']['Row']['id'];
 export type Player = Database['public']['Tables']['players']['Row'];
 
 export type GameRound = Database['public']['Tables']['game_rounds']['Row'] & {
-  timer_duration?: number;
+	timer_duration?: number;
 };
 
 export type PlayerMove = Database['public']['Tables']['player_moves']['Row'];

@@ -20,6 +20,7 @@
 	import type { Tour } from 'shepherd.js';
 	import RoundTransition from '@/components/round-transition.svelte';
 	import { goto } from '$app/navigation';
+	import StatusPill from '@/components/status-pill.svelte';
 
 	let tour: Tour | undefined;
 
@@ -161,6 +162,10 @@
 	<Map {gameState} position={mapPosition} {tourCompleted} />
 	<MiniMap position={mapPosition} />
 	<RoundIndicator rounds={gameState.rounds} currentRound={gameState.currentRound} />
+	<StatusPill
+		playerState={gameState.playersState[gameState.playerId]}
+		currentRound={gameState.currentRound}
+	/>
 	<Button
 		size="lg"
 		onclick={() => (openStoryDialog = true)}

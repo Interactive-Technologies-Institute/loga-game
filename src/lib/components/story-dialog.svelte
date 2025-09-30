@@ -14,6 +14,9 @@
 	import { Flag } from 'lucide-svelte';
 	import Timer from './timer.svelte';
 	import PostStory from './post-story-icon.svelte';
+	import { getCharacterCategory, type Character } from '@src/lib/types';
+	import SpeciesInfoDialog from './species-info-dialog.svelte';
+	import LandmarkInfoDialog from './landmark-info-dialog.svelte';
 
 	let audio: HTMLAudioElement;
 	let click_sound: HTMLAudioElement;
@@ -58,8 +61,14 @@
 		}
 	});
 
-	let playerCards = $derived.by(() => {
+	let playerCardIds = $derived.by(() => {
 		return gameState.playersCards.filter((card) => card.player_id === gameState.playerId);
+	});
+
+	let playerCards = $derived.by(() => {
+		return gameState.cards.filter((card) =>
+			playerCardIds.map((pc) => pc.card_id).includes(card.id)
+		);
 	});
 
 	let playerAnswers = $derived.by(() => {
@@ -105,21 +114,24 @@
 	let playerState = $derived.by(() => {
 		return gameState.playersState[gameState.playerId].state;
 	});
+
+	let showSpeciesDialog = $state(false);
+	let showLandmarkDialog = $state(false);
 </script>
 
 <Dialog.Root bind:open>
 	<Dialog.Content
 		interactOutsideBehavior="ignore"
-		class="overflow-y-auto flex flex-col gap-y-10 max-h-[96vh] sm:max-h-[80vh] w-[calc(100vw-2rem)] lg:max-w-4xl pb-64 md:pb-0"
+		class="overflow-y-auto flex flex-col gap-y-10 max-h-[95vh] w-[95vw] md:w-[60dvw] bg-white rounded-2xl shadow-lg pb-80 md:pb-5"
 		style="transform-origin: center center;"
 	>
 		{#each sortedRounds as round (round.index)}
-			{@const card_id = playerCards.find((card) => card.round === round.index)?.card_id}
-			{@const card = CARDS.find((card) => card.id === card_id)}
+			{@const card_id = playerCardIds.find((card) => card.round === round.index)?.card_id}
+			{@const card = playerCards.find((card) => card.id === card_id)}
 			{@const answer = playerAnswers.find((answer) => answer.round === round.index)}
 			<div
 				id={`round-${round.index}`}
-				class="flex flex-col items-center md:flex-row md:items-stretch gap-8 w-full {round.index >
+				class="flex flex-col items-center lg:flex-row lg:items-stretch gap-8 w-full {round.index >
 				(currentRound ?? -1)
 					? 'opacity-30 grayscale'
 					: ''}"
@@ -127,6 +139,15 @@
 				{#if round.index === 0}
 					<div class="shrink-0">
 						<CharacterCard character={player?.character ?? 'child'} />
+						{#if player && ['zinos-petrel', 'iberian-green-frog', 'monk-seal', 'trocaz-pigeon'].includes(player.character ?? '')}
+							<Button variant="outline" class="mt-2" onclick={() => (showSpeciesDialog = true)}
+								>Learn more about your character</Button
+							>
+							<SpeciesInfoDialog
+								bind:open={showSpeciesDialog}
+								character={player?.character ?? 'child'}
+							/>
+						{/if}
 					</div>
 				{:else if round.index === 7}
 					<div class="shrink-0">
@@ -143,6 +164,12 @@
 				{:else if card}
 					<div class="shrink-0">
 						<Card {card} />
+						{#if card.type === 'landmark'}
+							<Button variant="outline" class="mt-2" onclick={() => (showLandmarkDialog = true)}
+								>Learn more about this landmark</Button
+							>
+							<LandmarkInfoDialog bind:open={showLandmarkDialog} {card} />
+						{/if}
 					</div>
 				{:else}
 					<div

@@ -28,6 +28,7 @@
 
 	let { data } = $props();
 	let story = data.story;
+	let cards = data.cards;
 
 	let storyCharacter = story.character.type;
 
@@ -40,7 +41,7 @@
 
 	function getCardDetails(cardId: number | null): CardType | null {
 		if (!cardId) return null;
-		return CARDS.find((card): card is CardType => card.id === cardId) ?? null;
+		return cards.find((card): card is CardType => card.id === cardId) ?? null;
 	}
 
 	function getRoundDetails(roundNumber: number): Round | null {

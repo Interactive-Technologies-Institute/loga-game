@@ -1,4 +1,5 @@
 import { goto } from '$app/navigation';
+import { getLocale } from '@src/paraglide/runtime.js';
 import { supabase } from '@/supabase';
 import type {
 	Card,
@@ -66,13 +67,21 @@ export const load = async ({ params, parent }) => {
 	}
 
 	async function getCards(): Promise<Card[]> {
-		const { data: cardsData, error: cardsError } = await supabase.from('cards').select('*');
+		const { data: cardsData, error: cardsError } = await supabase
+			.from('cards')
+			.select('id, type, title, hero_steps, character_category, prompt_text(text)')
+			.eq('prompt_text.lang', getLocale());
 
 		if (cardsError) {
 			return error(500, { message: 'Error fetching cards' });
 		}
 
-		return cardsData;
+		const cards = cardsData.map((card) => ({
+			...card,
+			text: card.prompt_text[0].text ?? ''
+		}));
+
+		return cards;
 	}
 
 	async function getGameRounds(gameId: GameId): Promise<GameRound[]> {
@@ -152,31 +161,28 @@ export const load = async ({ params, parent }) => {
 	const playerAnswers = await getPlayerAnswers(game.id);
 
 	// Check if player was inactive and if they can rejoin
-    if (player.is_active === false) {
-        const currentRound = gameRounds.length > 0 ? gameRounds[gameRounds.length - 1].round : 0;
-        const playerLastRound = Math.max(
-            ...playerMoves.filter(m => m.player_id === player.id).map(m => m.round),
-            ...playerAnswers.filter(a => a.player_id === player.id).map(a => a.round),
-            0
-        );
-        
-        // Don't allow rejoin if too far behind
-        if (currentRound - playerLastRound > 1) {
-			goto("/");
-            return error(403, { 
-                message: 'You cannot rejoin this game as it has progressed too far.' 
-            });
-        }
-        
-        // Reactivate the player
-        await supabase.rpc('update_player_activity', { game_code: code });
-        await supabase
-            .from('players')
-            .update({ is_active: true })
-            .eq('id', player.id);
-        
-        player.is_active = true;
-    }
+	if (player.is_active === false) {
+		const currentRound = gameRounds.length > 0 ? gameRounds[gameRounds.length - 1].round : 0;
+		const playerLastRound = Math.max(
+			...playerMoves.filter((m) => m.player_id === player.id).map((m) => m.round),
+			...playerAnswers.filter((a) => a.player_id === player.id).map((a) => a.round),
+			0
+		);
+
+		// Don't allow rejoin if too far behind
+		if (currentRound - playerLastRound > 1) {
+			goto('/');
+			return error(403, {
+				message: 'You cannot rejoin this game as it has progressed too far.'
+			});
+		}
+
+		// Reactivate the player
+		await supabase.rpc('update_player_activity', { game_code: code });
+		await supabase.from('players').update({ is_active: true }).eq('id', player.id);
+
+		player.is_active = true;
+	}
 
 	return {
 		stops,

@@ -7,7 +7,7 @@ export type Json =
   | Json[]
 
 export type Database = {
-  // Allows to automatically instanciate createClient with right options
+  // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
     PostgrestVersion: "12.2.3 (519615d)"
@@ -16,18 +16,24 @@ export type Database = {
     Tables: {
       cards: {
         Row: {
+          character_category: string[]
+          hero_steps: number[]
           id: number
           text: string
           title: string | null
           type: Database["public"]["Enums"]["stop_type"]
         }
         Insert: {
+          character_category?: string[]
+          hero_steps?: number[]
           id?: number
           text: string
           title?: string | null
           type: Database["public"]["Enums"]["stop_type"]
         }
         Update: {
+          character_category?: string[]
+          hero_steps?: number[]
           id?: number
           text?: string
           title?: string | null
@@ -252,6 +258,38 @@ export type Database = {
           },
         ]
       }
+      prompt_text: {
+        Row: {
+          card_id: number
+          created_at: string
+          id: number
+          lang: string
+          text: string
+        }
+        Insert: {
+          card_id?: number
+          created_at?: string
+          id?: number
+          lang?: string
+          text?: string
+        }
+        Update: {
+          card_id?: number
+          created_at?: string
+          id?: number
+          lang?: string
+          text?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "prompt_text_card_id_fkey"
+            columns: ["card_id"]
+            isOneToOne: true
+            referencedRelation: "cards"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       rounds: {
         Row: {
           description: string
@@ -379,7 +417,7 @@ export type Database = {
         Returns: undefined
       }
       player_answer: {
-        Args: { game_code: string; game_round: number; answer: string }
+        Args: { answer: string; game_code: string; game_round: number }
         Returns: undefined
       }
       player_move: {
@@ -397,18 +435,18 @@ export type Database = {
       save_story: {
         Args:
           | {
-              p_player_name: string
-              p_story_title: string
+              p_card_types: string[]
               p_character: Json
+              p_full_story: string
+              p_player_name: string
               p_rounds: Json
+              p_story_title: string
             }
           | {
-              p_player_name: string
-              p_story_title: string
               p_character: Json
+              p_player_name: string
               p_rounds: Json
-              p_card_types: string[]
-              p_full_story: string
+              p_story_title: string
             }
         Returns: string
       }
@@ -430,13 +468,14 @@ export type Database = {
       update_player_nickname_description: {
         Args: {
           game_code: string
-          player_nickname: string
           player_description: string
+          player_nickname: string
         }
         Returns: undefined
       }
     }
     Enums: {
+      character_category: "human" | "non-human"
       character_type:
         | "child"
         | "different-needs"
@@ -582,6 +621,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      character_category: ["human", "non-human"],
       character_type: [
         "child",
         "different-needs",
