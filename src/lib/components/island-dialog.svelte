@@ -29,7 +29,7 @@
 </script>
 
 <Dialog.Root bind:open>
-	<Dialog.Content class="overflow-y-auto h-[95vh] w-[95vw] lg:max-w-4xl flex flex-col">
+	<Dialog.Content class="overflow-y-auto max-h-[95vh] w-[95vw] lg:max-w-4xl flex flex-col">
 		<h2 class="text-2xl font-bold text-dark-green">{m.island_dialog_heading()}</h2>
 		<div class="space-y-4 flex-grow">
 			<!-- Image Carousel -->
