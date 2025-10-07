@@ -19,7 +19,6 @@
 		if (typeof translation === 'function') return translation();
 		return 'Translation missing';
 	}
-	const paras = (s: string) => s.split(/\n{2,}/g);
 </script>
 
 <Dialog.Root bind:open>
@@ -35,10 +34,13 @@
 				alt={getTranslation(details.title)}
 				class="aspect-video object-cover rounded-xl border-4 border-dark-green"
 			/>
-			<div>
-				{#each paras(getTranslation(details.description)) as p, i}
-					<p class="leading-relaxed mb-3 {i === 1 ? 'italic text-gray-600' : ''}">{p}</p>
-				{/each}
+			<div class="flex flex-col gap-2">
+				<p>{getTranslation(details.description)}</p>
+				<p class="">
+					<span class="font-semibold text-dark-green mr-2">{m.fun_fact()}:</span>{getTranslation(
+						details.fun_fact
+					)}
+				</p>
 			</div>
 		{:else}
 			<p class="text-gray-500">No species info available.</p>

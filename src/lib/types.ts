@@ -59,6 +59,13 @@ export const CHARACTER_CATEGORIES: Record<CharacterCategory, Character[]> = {
 	]
 };
 
+export type Landmark = {
+	id: number;
+	name: string;
+	description: { en: string; pt: string };
+	image_url: string;
+};
+
 export const CHARACTER_OPTIONS: Character[] = [
 	...CHARACTER_CATEGORIES['human'],
 	...CHARACTER_CATEGORIES['non-human']

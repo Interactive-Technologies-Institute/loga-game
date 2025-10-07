@@ -9,7 +9,7 @@
 	import Button from '@/components/ui/button/button.svelte';
 	import { GameState } from '@/state/game-state.svelte';
 	import { MapPosition } from '@/state/map-position.svelte';
-	import { CircleHelp, ScrollText, LogOut } from 'lucide-svelte';
+	import { CircleHelp, ScrollText, LogOut, Image } from 'lucide-svelte';
 	import type { PageData } from './$types';
 	import EndDialog from '@/components/end-dialog.svelte';
 	import { m } from '@src/paraglide/messages';
@@ -21,6 +21,7 @@
 	import RoundTransition from '@/components/round-transition.svelte';
 	import { goto } from '$app/navigation';
 	import StatusPill from '@/components/status-pill.svelte';
+	import IslandDialog from '@/components/island-dialog.svelte';
 
 	let tour: Tour | undefined;
 
@@ -112,6 +113,7 @@
 	let openStoryDialog = $state(false);
 	let openHelpDialog = $state(false);
 	let openEndDialog = $state(false);
+	let openIslandDialog = $state(false);
 
 	$effect(() => {
 		if (playerState === 'writing') {
@@ -166,6 +168,15 @@
 		playerState={gameState.playersState[gameState.playerId]}
 		currentRound={gameState.currentRound}
 	/>
+	<Button
+		size="icon-lg"
+		class="absolute right-4 -translate-y-1/2 top-1/2 images"
+		disabled={!tourCompleted}
+		onclick={() => (openIslandDialog = true)}
+	>
+		<Image />
+	</Button>
+	<IslandDialog bind:open={openIslandDialog} />
 	<Button
 		size="lg"
 		onclick={() => (openStoryDialog = true)}

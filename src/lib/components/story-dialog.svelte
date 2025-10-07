@@ -117,6 +117,11 @@
 
 	let showSpeciesDialog = $state(false);
 	let showLandmarkDialog = $state(false);
+	function isNonHumanCharacter(character: Character | null | undefined): boolean {
+		if (!character) return false;
+		const category = getCharacterCategory(character);
+		return category === 'non-human';
+	}
 </script>
 
 <Dialog.Root bind:open>
@@ -139,7 +144,7 @@
 				{#if round.index === 0}
 					<div class="shrink-0">
 						<CharacterCard character={player?.character ?? 'child'} />
-						{#if player && ['zinos-petrel', 'iberian-green-frog', 'monk-seal', 'trocaz-pigeon'].includes(player.character ?? '')}
+						{#if player && isNonHumanCharacter(player.character)}
 							<Button variant="outline" class="mt-2" onclick={() => (showSpeciesDialog = true)}
 								>Learn more about your character</Button
 							>
