@@ -1,5 +1,6 @@
 import { goto } from '$app/navigation';
 import { supabase } from '@/supabase';
+import { getCharacterCategory } from '../types';
 import type {
 	Card,
 	Game,
@@ -403,10 +404,23 @@ export class GameState {
 	}
 
 	async playerMove(stopId: StopId) {
+		const currentPlayer = this.players.find(p => p.id === this.playerId);
+		if (!currentPlayer) {
+			console.error('Current player not found');
+			return;
+    	}
+
+		const characterCategory = getCharacterCategory(currentPlayer.character ?? 'child');
+
+		console.log("Hero step:", this.currentRound);
+		console.log("Character category:", characterCategory);
+
 		const { error } = await supabase.rpc('player_move', {
 			game_code: this.code,
 			game_round: this.currentRound,
-			stop_id: stopId
+			stop_id: stopId,
+			p_hero_step: this.currentRound,
+			p_character_category: characterCategory
 		});
 		if (error) {
 			console.error(error);

@@ -77,6 +77,7 @@
 		data.playerCards,
 		data.playerAnswers
 	);
+
 	let mapPosition = new MapPosition();
 
 	let showRoundTransition = $state(false);

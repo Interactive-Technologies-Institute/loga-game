@@ -19,7 +19,6 @@ export type Database = {
           character_category: string[]
           hero_steps: number[]
           id: number
-          text: string
           title: string | null
           type: Database["public"]["Enums"]["stop_type"]
         }
@@ -27,7 +26,6 @@ export type Database = {
           character_category?: string[]
           hero_steps?: number[]
           id?: number
-          text: string
           title?: string | null
           type: Database["public"]["Enums"]["stop_type"]
         }
@@ -35,7 +33,6 @@ export type Database = {
           character_category?: string[]
           hero_steps?: number[]
           id?: number
-          text?: string
           title?: string | null
           type?: Database["public"]["Enums"]["stop_type"]
         }
@@ -284,7 +281,7 @@ export type Database = {
           {
             foreignKeyName: "prompt_text_card_id_fkey"
             columns: ["card_id"]
-            isOneToOne: true
+            isOneToOne: false
             referencedRelation: "cards"
             referencedColumns: ["id"]
           },
@@ -421,7 +418,15 @@ export type Database = {
         Returns: undefined
       }
       player_move: {
-        Args: { game_code: string; game_round: number; stop_id: number }
+        Args:
+          | {
+              game_code: string
+              game_round: number
+              p_character_category: string
+              p_hero_step: number
+              stop_id: number
+            }
+          | { game_code: string; game_round: number; stop_id: number }
         Returns: number
       }
       player_start: {

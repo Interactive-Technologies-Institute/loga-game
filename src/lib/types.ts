@@ -24,9 +24,8 @@ export type Card = {
 	id: number;
 	type: CardType;
 	title: string | null;
-	text: string;
 	hero_steps: number[];
-	character_category: CharacterCategory;
+	character_category: CharacterCategory[];
 };
 
 export type CardPrompt = {
