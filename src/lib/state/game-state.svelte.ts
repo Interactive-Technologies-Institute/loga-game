@@ -1,5 +1,6 @@
 import { goto } from '$app/navigation';
 import { supabase } from '@/supabase';
+import { getCharacterCategory } from '../types';
 import type {
 	Card,
 	Game,
@@ -38,19 +39,20 @@ export class GameState {
 		}, {});
 	});
 
-    roundTimerDuration: number = $state(0);
+	roundTimerDuration: number = $state(0);
 	private activityInterval: ReturnType<typeof setInterval> | null = null;
-    private beforeUnloadHandler: (() => void) | null = null;
+	private beforeUnloadHandler: (() => void) | null = null;
+	private unloadTimeout: ReturnType<typeof setTimeout> | null = null;
 
 	private getGameId(): number {
-    // Find a player's game_id (they all share the same game_id)
-    const gameId = this.players?.[0]?.game_id;
-    if (!gameId) {
-        console.error('Could not find game ID for filtering subscriptions');
-        return -1; // Return a value that won't match any real game ID
-    }
-    return gameId;
-}
+		// Find a player's game_id (they all share the same game_id)
+		const gameId = this.players?.[0]?.game_id;
+		if (!gameId) {
+			console.error('Could not find game ID for filtering subscriptions');
+			return -1; // Return a value that won't match any real game ID
+		}
+		return gameId;
+	}
 
 	constructor(
 		stops: Stop[],
@@ -76,10 +78,14 @@ export class GameState {
 		this.playersCards = playerCards;
 		this.playersAnswers = playerAnswers;
 
+		if (this.unloadTimeout) {
+			clearTimeout(this.unloadTimeout);
+			this.unloadTimeout = null;
+		}
+
 		this.initializeTimerState();
 		this.setupActivityTracking();
-        this.setupPageUnloadDetection();
-
+		this.setupPageUnloadDetection();
 
 		this.subscribeGame();
 		this.subscribeGameRounds();
@@ -92,49 +98,52 @@ export class GameState {
 	}
 
 	private setupActivityTracking() {
-        this.activityInterval = setInterval(async () => {
-            if (this.code && this.state !== 'finished') {
-                await this.updatePlayerActivity();
-            }
-        }, 30000);
-        
-        this.updatePlayerActivity();
-    }
+		this.activityInterval = setInterval(async () => {
+			if (this.code && this.state !== 'finished') {
+				await this.updatePlayerActivity();
+			}
+		}, 30000);
 
-    private setupPageUnloadDetection() {
+		this.updatePlayerActivity();
+	}
+
+	private setupPageUnloadDetection() {
 		if (typeof window !== 'undefined') {
 			this.beforeUnloadHandler = () => {
-				// Get current player's userId
-				const currentPlayer = this.players.find(p => p.id === this.playerId);
+				if (this.unloadTimeout) clearTimeout(this.unloadTimeout);
+
+				const currentPlayer = this.players.find((p) => p.id === this.playerId);
 				if (!currentPlayer) return;
 
-				// Use sendBeacon with FormData (more reliable than JSON for sendBeacon)
 				const formData = new FormData();
 				formData.append('code', this.code);
 				formData.append('userId', currentPlayer.user_id);
-				
-				navigator.sendBeacon('/api/mark-inactive', formData);
+
+				// Delay marking inactive by 10 seconds
+				this.unloadTimeout = setTimeout(() => {
+					navigator.sendBeacon('/api/mark-inactive', formData);
+				}, 10000);
 			};
-			
+
 			window.addEventListener('beforeunload', this.beforeUnloadHandler);
 			window.addEventListener('pagehide', this.beforeUnloadHandler);
 		}
 	}
 
-    private async updatePlayerActivity() {
-        try {
-            await supabase.rpc('update_player_activity', {
-                game_code: this.code
-            });
-        } catch (error) {
-            console.error('Failed to update player activity:', error);
-        }
-    }
+	private async updatePlayerActivity() {
+		try {
+			await supabase.rpc('update_player_activity', {
+				game_code: this.code
+			});
+		} catch (error) {
+			console.error('Failed to update player activity:', error);
+		}
+	}
 
-    async markPlayerInactive() {
+	async markPlayerInactive() {
 		try {
 			// Get userId from the current player in the players array
-			const currentPlayer = this.players.find(p => p.id === this.playerId);
+			const currentPlayer = this.players.find((p) => p.id === this.playerId);
 			if (!currentPlayer) {
 				console.error('Current player not found');
 				return false;
@@ -143,43 +152,43 @@ export class GameState {
 			const response = await fetch('/api/mark-inactive', {
 				method: 'POST',
 				headers: {
-					'Content-Type': 'application/json',
+					'Content-Type': 'application/json'
 				},
-				body: JSON.stringify({ 
-					code: this.code, 
+				body: JSON.stringify({
+					code: this.code,
 					userId: currentPlayer.user_id
 				})
 			});
-			
+
 			if (response.ok) {
 				// Update local state
-				this.players = this.players.map(p => 
+				this.players = this.players.map((p) =>
 					p.id === this.playerId ? { ...p, is_active: false } : p
 				);
 				return true;
 			}
-			
+
 			return false;
 		} catch (err) {
-			console.error("Error marking player inactive:", err);
+			console.error('Error marking player inactive:', err);
 			return false;
 		}
 	}
 
-    public cleanup() {
+	public cleanup() {
 		// Clear activity tracking interval
 		if (this.activityInterval) {
 			clearInterval(this.activityInterval);
 			this.activityInterval = null;
 		}
-		
+
 		// Remove page unload event listeners
 		if (typeof window !== 'undefined' && this.beforeUnloadHandler) {
 			window.removeEventListener('beforeunload', this.beforeUnloadHandler);
 			window.removeEventListener('pagehide', this.beforeUnloadHandler);
 			this.beforeUnloadHandler = null;
 		}
-		
+
 		// Unsubscribe from all Supabase channels
 		supabase.channel('game').unsubscribe();
 		supabase.channel('game_rounds').unsubscribe();
@@ -188,7 +197,7 @@ export class GameState {
 		supabase.channel('player_cards').unsubscribe();
 		supabase.channel('player_answers').unsubscribe();
 		supabase.channel('round_timers').unsubscribe();
-		
+
 		// Optional: Clear all reactive state arrays to prevent memory leaks
 		this.players = [];
 		this.playersMoves = [];
@@ -200,8 +209,8 @@ export class GameState {
 	// Add this method to initialize timer state
 	private initializeTimerState() {
 		// Find the current round
-		const currentRound = this.gameRounds.find(r => r.round === this.currentRound);
-		
+		const currentRound = this.gameRounds.find((r) => r.round === this.currentRound);
+
 		// If the current round has timer data, initialize the timer state
 		if (currentRound && currentRound.timer_duration) {
 			this.roundTimerDuration = currentRound.timer_duration;
@@ -244,7 +253,7 @@ export class GameState {
 					event: 'INSERT',
 					schema: 'public',
 					table: 'game_rounds',
-                	filter: `game_id=eq.${this.getGameId()}`
+					filter: `game_id=eq.${this.getGameId()}`
 				},
 				(payload) => {
 					const gameRound = payload.new as GameRound;
@@ -263,7 +272,7 @@ export class GameState {
 					event: 'UPDATE',
 					schema: 'public',
 					table: 'players',
-                	filter: `game_id=eq.${this.getGameId()}`
+					filter: `game_id=eq.${this.getGameId()}`
 				},
 				(payload) => {
 					const player = payload.new as Player;
@@ -286,7 +295,7 @@ export class GameState {
 					event: 'INSERT',
 					schema: 'public',
 					table: 'player_moves',
-                	filter: `game_id=eq.${this.getGameId()}`
+					filter: `game_id=eq.${this.getGameId()}`
 				},
 				(payload) => {
 					this.playersMoves.push(payload.new as PlayerMove);
@@ -304,7 +313,7 @@ export class GameState {
 					event: 'INSERT',
 					schema: 'public',
 					table: 'player_cards',
-                	filter: `game_id=eq.${this.getGameId()}`
+					filter: `game_id=eq.${this.getGameId()}`
 				},
 				(payload) => {
 					this.playersCards.push(payload.new as PlayerCard);
@@ -322,18 +331,18 @@ export class GameState {
 					event: '*',
 					schema: 'public',
 					table: 'player_answers',
-                	filter: `game_id=eq.${this.getGameId()}`
+					filter: `game_id=eq.${this.getGameId()}`
 				},
 				(payload) => {
 					// Check if this is an INSERT event
 					if (payload.eventType === 'INSERT') {
 						this.playersAnswers.push(payload.new as PlayerAnswer);
-					} 
+					}
 					// Check if this is an UPDATE event
 					else if (payload.eventType === 'UPDATE') {
 						// Update the existing answer instead of adding a new one
 						const updatedAnswer = payload.new as PlayerAnswer;
-						this.playersAnswers = this.playersAnswers.map(answer => 
+						this.playersAnswers = this.playersAnswers.map((answer) =>
 							answer.id === updatedAnswer.id ? updatedAnswer : answer
 						);
 					}
@@ -395,10 +404,23 @@ export class GameState {
 	}
 
 	async playerMove(stopId: StopId) {
+		const currentPlayer = this.players.find(p => p.id === this.playerId);
+		if (!currentPlayer) {
+			console.error('Current player not found');
+			return;
+    	}
+
+		const characterCategory = getCharacterCategory(currentPlayer.character ?? 'child');
+
+		console.log("Hero step:", this.currentRound);
+		console.log("Character category:", characterCategory);
+
 		const { error } = await supabase.rpc('player_move', {
 			game_code: this.code,
 			game_round: this.currentRound,
-			stop_id: stopId
+			stop_id: stopId,
+			p_hero_step: this.currentRound,
+			p_character_category: characterCategory
 		});
 		if (error) {
 			console.error(error);
@@ -517,56 +539,56 @@ export class GameState {
 		// Generate random timer between 2-4 minutes
 		const durationMinutes = Math.floor(Math.random() * 3) + 2;
 		const durationSeconds = durationMinutes * 60;
-		
-		const currentGameRound = this.gameRounds.find(r => r.round === this.currentRound);
+
+		const currentGameRound = this.gameRounds.find((r) => r.round === this.currentRound);
 		if (!currentGameRound) {
 			console.error('Cannot find current game round to start timer');
 			return false;
 		}
-		
+
 		this.roundTimerDuration = durationSeconds;
-		
+
 		const { error } = await supabase
 			.from('game_rounds')
-			.update({timer_duration: durationSeconds })
+			.update({ timer_duration: durationSeconds })
 			.eq('id', currentGameRound.id);
-			
+
 		if (error) {
 			console.error('Failed to save timer duration:', error);
 			return false;
 		}
-		
+
 		return true;
 	}
 
 	async subscribeRoundTimer() {
-    supabase
-        .channel('round_timers')
-        .on(
-            'postgres_changes',
-            {
-                event: 'UPDATE',
-                schema: 'public',
-                table: 'game_rounds',
-                filter: `game_id=eq.${this.getGameId()}`
-            },
-            (payload) => {
-                const updatedRound = payload.new as GameRound;
-                
-                // Only update timer state if this is for the current round
-                if (updatedRound.round === this.currentRound) {
-                    if (updatedRound.timer_duration) {
-                        this.roundTimerDuration = updatedRound.timer_duration;
-                    }
-                }
-                
-                // Update the game rounds array
-                this.gameRounds = this.gameRounds.map(round => 
-                    round.id === updatedRound.id ? { ...round, ...updatedRound } : round
-                );
-            }
-        )
-        .subscribe();
+		supabase
+			.channel('round_timers')
+			.on(
+				'postgres_changes',
+				{
+					event: 'UPDATE',
+					schema: 'public',
+					table: 'game_rounds',
+					filter: `game_id=eq.${this.getGameId()}`
+				},
+				(payload) => {
+					const updatedRound = payload.new as GameRound;
+
+					// Only update timer state if this is for the current round
+					if (updatedRound.round === this.currentRound) {
+						if (updatedRound.timer_duration) {
+							this.roundTimerDuration = updatedRound.timer_duration;
+						}
+					}
+
+					// Update the game rounds array
+					this.gameRounds = this.gameRounds.map((round) =>
+						round.id === updatedRound.id ? { ...round, ...updatedRound } : round
+					);
+				}
+			)
+			.subscribe();
 	}
 
 	async updatePlayerAnswer(answerId: number, newText: string) {
@@ -575,14 +597,14 @@ export class GameState {
 				.from('player_answers')
 				.update({ answer: newText })
 				.eq('id', answerId);
-				
+
 			if (error) throw error;
-			
+
 			// Update local state
-			this.playersAnswers = this.playersAnswers.map(answer => 
+			this.playersAnswers = this.playersAnswers.map((answer) =>
 				answer.id === answerId ? { ...answer, answer: newText } : answer
 			);
-			
+
 			return true;
 		} catch (error) {
 			console.error('Error updating answer:', error);

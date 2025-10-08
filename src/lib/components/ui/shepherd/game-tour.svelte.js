@@ -167,6 +167,29 @@ export function createGameTour() {
 			}
 		},
 		{
+			id: 'images-button',
+			title: m.images_title(),
+			text: m.images_description(),
+			attachTo: {
+				element: '.images',
+				on: 'bottom'
+			},
+			buttons: [
+				{
+					text: 'Skip',
+					action: tour.cancel,
+					secondary: true
+				},
+				{
+					text: m.continue(),
+					action: tour.next
+				}
+			],
+			floatingUIOptions: {
+				middleware: [offset({ mainAxis: 20 })]
+			}
+		},
+		{
 			id: 'help-button',
 			title: m.instructions(),
 			text: m.instructions_description(),

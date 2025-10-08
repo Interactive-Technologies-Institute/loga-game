@@ -76,12 +76,12 @@
 	function getCardText(playerId: number, round: number): string {
 		if (!gameState) return '';
 
-		const playerCard = gameState.playersCards.find(
+		const playerCardIds = gameState.playersCards.find(
 			(card) => card.player_id === playerId && card.round === round
 		);
-		if (playerCard) {
-			const card = CARDS.find((c) => c.id === playerCard.card_id);
-			return getTranslation(card?.text);
+		if (playerCardIds) {
+			const card = gameState.cards.find((c) => c.id === playerCardIds.card_id);
+			return card?.text ?? '';
 		}
 		return '';
 	}

@@ -23,218 +23,63 @@
 		transitionState,
 		isCurrentPlayer = false
 	}: PlayerBadgeProps = $props();
-	let isVisible = $state(true);
-	let isExiting = $state(false);
-	let previousState = $state(playerState.state);
-	let exitTimeout: ReturnType<typeof setTimeout> | undefined = $state(undefined);
-
-	function clearExistingTimeout() {
-		if (exitTimeout) {
-			clearTimeout(exitTimeout);
-			exitTimeout = undefined;
-		}
-	}
-
-	$effect(() => {
-		if (transitionState === 'ended') {
-			if (tourCompleted && previousState !== playerState.state) {
-				clearExistingTimeout();
-				if (isVisible) {
-					startExit();
-				} else {
-					// If not visible, start new animation immediately
-					startNewAnimation();
-				}
-			}
-		}
-	});
-
-	$effect(() => {
-		if (tourCompleted === false) {
-			isVisible = false;
-		} else if (tourCompleted === true) {
-			startNewAnimation();
-		}
-	});
-
-	function startNewAnimation() {
-		previousState = playerState.state;
-		isExiting = false;
-		isVisible = true;
-
-		exitTimeout = setTimeout(() => {
-			startExit();
-			clearExistingTimeout();
-		}, 6000);
-	}
-
-	function startExit() {
-		isExiting = true;
-	}
-
-	onMount(() => {
-		return () => {
-			clearExistingTimeout();
-		};
-	});
-	function getMessage() {
-		if (currentRound === 0) {
-			if (playerState.state === 'done') {
-				return {
-					title: m.intro(),
-					subtitle: m.you_are_done()
-				};
-			}
-			return {
-				title: m.game_is_starting(),
-				subtitle:
-					playerState.state === 'starting' ? m.choose_starting_stop() : m.write_introduction()
-			};
-		}
-
-		if (currentRound === 7) {
-			return {
-				title: playerState.state === 'writing' ? m.game_is_ending() : m.game_ended(),
-				subtitle:
-					playerState.state === 'done'
-						? m.you_are_done()
-						: playerState.state === 'writing'
-							? m.write_final_part()
-							: m.you_are_done()
-			};
-		}
-
-		return {
-			title: `${m.round()} ${currentRound}`,
-			subtitle:
-				playerState.state === 'moving'
-					? m.choose_your_new_stop()
-					: playerState.state === 'writing'
-						? m.write_next_part()
-						: m.you_are_done()
-		};
-	}
 </script>
 
-<div
-	class="rounded-full w-12 h-12 sm:h-16 sm:w-16 relative {isCurrentPlayer ? 'player-badges' : ''}"
->
-	{#if isVisible}
-		<div
-			class="absolute bg-white flex flex-col items-start justify-center w-max h-12 sm:h-16 pl-10 lg:pl-12 pr-4 lg:pr-6 rounded-br-full rounded-tr-full left-1/2 z-10 {isExiting
-				? 'slide-out'
-				: 'slide-in'}"
-		>
-			<div class="overflow-hidden max-w-xs">
-				<h3
-					class="text-dark-green font-bold text-xs sm:text-sm whitespace-nowrap overflow-ellipsis overflow-hidden {isExiting
-						? 'fade-out'
-						: 'fade-in'}"
-				>
-					{getMessage().title}
-				</h3>
-				<p
-					class="text-sm sm:text-lg whitespace-nowrap overflow-ellipsis overflow-hidden {isExiting
-						? 'fade-out-delayed'
-						: 'fade-in-delayed'}"
-				>
-					{getMessage().subtitle}
-				</p>
-			</div>
-		</div>
-	{/if}
+<div class="flex relative {isCurrentPlayer ? 'player-badges' : ''}">
 	<img
 		src={`/images/characters/badges/${player.character}.svg`}
 		alt={player.nickname}
-		class="w-full h-full relative z-20"
+		class="h-12 w-12 md:h-14 md:w-14 relative rounded-full z-20 {isCurrentPlayer
+			? 'border-4 border-dark-green'
+			: ''}"
 	/>
 	<div
-		class="absolute -top-3 -right-3 rounded-full w-8 h-8 bg-dark-green flex items-center justify-center text-dark-green z-30"
+		class="absolute origin-right -top-2 right-6 translate-x-full rounded-full bg-dark-green text-dark-green z-30 flex items-center py-2 px-3 max-w-xs"
 	>
 		{#if playerState.state === 'starting'}
-			<Flag class="w-4 h-4 stroke-white" />
+			<div class="flex items-center gap-2">
+				<Flag class="w-3 h-3 stroke-white" />
+				{#if isCurrentPlayer}
+					<span class="text-white text-xs text-nowrap">{m.starting()}</span>
+				{:else}
+					<span class="text-white text-xs text-nowrap"
+						>{m.starting_player({ nickname: player.nickname ?? '' })}</span
+					>
+				{/if}
+			</div>
 		{:else if playerState.state === 'moving'}
-			<Route class="w-4 h-4 stroke-white" />
+			<div class="flex items-center gap-2">
+				<Route class="w-3 h-3 stroke-white" />
+				{#if isCurrentPlayer}
+					<span class="text-white text-xs text-nowrap">{m.moving()}</span>
+				{:else}
+					<span class="text-white text-xs text-nowrap"
+						>{m.moving_player({ nickname: player.nickname ?? '' })}</span
+					>
+				{/if}
+			</div>
 		{:else if playerState.state === 'writing'}
-			<SquarePen class="w-4 h-4 stroke-white" />
+			<div class="flex items-center gap-2">
+				<SquarePen class="w-3 h-3 stroke-white" />
+				{#if isCurrentPlayer}
+					<span class="text-white text-xs text-nowrap">{m.writing()}</span>
+				{:else}
+					<span class="text-white text-xs text-nowrap"
+						>{m.writing_player({ nickname: player.nickname ?? '' })}</span
+					>
+				{/if}
+			</div>
 		{:else if playerState.state === 'done'}
-			<Check class="w-4 h-4 stroke-white" />
+			<div class="flex items-center gap-2">
+				<Check class="w-3 h-3 stroke-white" />
+				{#if isCurrentPlayer}
+					<span class="text-white text-xs text-nowrap">{m.done()}</span>
+				{:else}
+					<span class="text-white text-xs text-nowrap"
+						>{m.done_player({ nickname: player.nickname ?? '' })}</span
+					>
+				{/if}
+			</div>
 		{/if}
 	</div>
 </div>
-
-<style>
-	@keyframes slide-in {
-		from {
-			transform: translateX(-50%) scaleX(0);
-			opacity: 0;
-		}
-		to {
-			transform: translateX(0) scaleX(1);
-			opacity: 1;
-		}
-	}
-
-	@keyframes slide-out {
-		from {
-			transform: translateX(0) scaleX(1);
-			opacity: 1;
-		}
-		to {
-			transform: translateX(-50%) scaleX(0);
-			opacity: 0;
-		}
-	}
-
-	@keyframes fade-in {
-		from {
-			transform: translateX(-20px);
-			opacity: 0;
-		}
-		to {
-			transform: translateX(0);
-			opacity: 1;
-		}
-	}
-
-	@keyframes fade-out {
-		from {
-			transform: translateX(0);
-			opacity: 1;
-		}
-		to {
-			transform: translateX(-20px);
-			opacity: 0;
-		}
-	}
-
-	.slide-in {
-		animation: slide-in 0.5s ease-in-out forwards;
-	}
-
-	.slide-out {
-		animation: slide-out 0.5s ease-in-out forwards;
-		animation-delay: 0.25s;
-	}
-
-	.fade-in {
-		opacity: 0;
-		animation: fade-in 0.75s ease-in-out forwards;
-		animation-delay: 0.25s;
-	}
-
-	.fade-out {
-		animation: fade-out 0.25s ease-in-out forwards;
-	}
-
-	.fade-in-delayed {
-		opacity: 0;
-		animation: fade-in 0.8s ease-in-out forwards;
-		animation-delay: 0.3s;
-	}
-
-	.fade-out-delayed {
-		animation: fade-out 0.25s ease-in-out forwards;
-		animation-delay: 0.1s;
-	}
-</style>

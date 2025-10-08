@@ -91,13 +91,17 @@
 			"Create your own story from the perspective of a character in the island of Madeira."
 		</p>
 		<div
-			class="w-full flex flex-col items-stretch justify-center gap-4 mt-4 p-4 rounded-lg bg-white border-2 border-sense-red/20"
+			class="w-full flex flex-col items-stretch justify-center gap-6 mt-4 p-4 rounded-lg border-2"
 		>
 			<div class="flex flex-col items-center justify-center">
 				<Button size="lg" onclick={createGame}>{m.start_new_game()}</Button>
 			</div>
-			<p class="text-dark-green text-center text-lg font-bold">{m.or()}</p>
-			<div class="w-full flex flex-col items-center justify-center gap-4">
+			<div class="flex items-center gap-4 w-full">
+				<div class="h-px w-full bg-dark-green"></div>
+				<p class="text-dark-green text-center text-lg font-bold">{m.or()}</p>
+				<div class="h-px w-full bg-dark-green"></div>
+			</div>
+			<div class="w-full flex flex-col items-center justify-center gap-2">
 				<p class="flex items-center justify-center text-dark-green font-medium">
 					{m.label_join_game()}
 				</p>
@@ -110,9 +114,13 @@
 						</InputCode.Group>
 					{/snippet}
 				</InputCode.Root>
-				<Button size="lg" onclick={joinGame}>{m.join_game()}</Button>
+				<Button size="lg" class="mt-2" onclick={joinGame}>{m.join_game()}</Button>
 			</div>
-			<p class="text-dark-green text-center text-lg font-bold">{m.or()}</p>
+			<div class="flex items-center gap-4 w-full">
+				<div class="h-px w-full bg-dark-green"></div>
+				<p class="text-dark-green text-center text-lg font-bold">{m.or()}</p>
+				<div class="h-px w-full bg-dark-green"></div>
+			</div>
 			<div class="flex flex-col items-center justify-center">
 				<Button
 					variant="outline"
